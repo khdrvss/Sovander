@@ -1,0 +1,253 @@
+# CI and offline gate (task 6.2; Requirements 9.6, 9.8, 13.1).
+#
+# Everything runs on GitHub's Ubuntu VMs themselves, not in containers, so AppArmor is the real
+# kernel's and the Python, GTK, LibreOffice and PyMuPDF are Ubuntu's own packages of each release,
+# as users get them (no setup-python outside the lint job).
+#
+#   lint     ruff, shell syntax, actionlint
+#   unit     pytest -m "not engine and not gui": unit, packaging, router/archive fuzz, unconfined probe
+#   gui      the views under Xvfb
+#   engine   LibreOffice nogui + python3-uno from the archive, production pipe connection
+#   package  build the .deb, install it with apt, load the profile, packaging tests, purge
+#   offline  the installed .deb inside its profile: VERIFIED, no inet, unix works (tests/offline/run-gate.sh)
+#
+# Actions are pinned by commit SHA (the tag in the comment is for humans); permissions are read-only.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTEST_ADDOPTS: "-p no:cacheprovider"
+  UNIT_PACKAGES: >-
+    python3-pytest python3-gi gir1.2-glib-2.0 python3-fitz python3-cryptography python3-charset-normalizer
+  GUI_PACKAGES: >-
+    xvfb libgl1-mesa-dri gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0
+    heif-gdk-pixbuf libavif-gdk-pixbuf fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
+  ENGINE_PACKAGES: >-
+    python3-uno libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui
+    libreoffice-draw-nogui fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: ruff
+        run: |
+          python -m pip install --disable-pip-version-check ruff==0.16.9
+          ruff check .
+      - name: Shell syntax
+        run: |
+          for script in scripts/*.sh packaging/*.sh tests/offline/*.sh; do bash -n "$script"; done
+          for script in packaging/debian/postinst packaging/debian/prerm packaging/debian/postrm; do sh -n "$script"; done
+      - name: actionlint
+        env:
+          VERSION: 1.7.12
+          SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          tarball="$RUNNER_TEMP/actionlint.tar.gz"
+          curl -fsSL --proto '=https' -o "$tarball" \
+            "https://github.com/rhysd/actionlint/releases/download/v${VERSION}/actionlint_${VERSION}_linux_amd64.tar.gz"
+          echo "$SHA256  $tarball" | sha256sum -c -
+          tar -xzf "$tarball" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -color
+
+  unit:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Restore downloaded packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-unit-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: apt-${{ matrix.os }}-unit-
+      - name: Install Ubuntu's packages
+        run: |
+          read -ra packages <<<"$UNIT_PACKAGES"
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends -o APT::Keep-Downloaded-Packages=true \
+            -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+      - name: Tests without engine or display
+        run: python3 -m pytest -m "not engine and not gui" -rs
+
+  gui:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Restore downloaded packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-gui-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: apt-${{ matrix.os }}-gui-
+      - name: Install Ubuntu's packages
+        run: |
+          read -ra packages <<<"$UNIT_PACKAGES $GUI_PACKAGES"
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
+            -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+      - name: View tests under Xvfb
+        run: xvfb-run -a python3 -m pytest -m gui -rs
+
+  engine:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Restore downloaded packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-engine-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: apt-${{ matrix.os }}-engine-
+      - name: Install Ubuntu's packages
+        run: |
+          read -ra packages <<<"$UNIT_PACKAGES $ENGINE_PACKAGES"
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
+            -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+      # tests/engine skips when the engine is missing; fail here instead of passing on skips
+      - name: The engine is there
+        run: |
+          soffice --version
+          python3 -c 'import uno; print("pyuno", uno.__file__)'
+      - name: Engine tests (production pipe connection)
+        run: python3 -m pytest -m engine -rs tests/engine
+      # Separate run: one LibreOffice at a time (tests/engine keeps its own until the session ends)
+      - name: Engine fuzz smoke and first-page timings
+        env:
+          SOVANDER_REQUIRE_ENGINE: "1"
+        run: python3 -m pytest -m engine -rs -s tests/fuzz tests/perf
+      - name: Keep the reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: engine-reports-${{ matrix.os }}
+          path: |
+            build/perf/
+            build/fuzz/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Restore downloaded packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-installed-${{ hashFiles('packaging/debian/control') }}
+          restore-keys: apt-${{ matrix.os }}-installed-
+      - name: Build the .deb
+        run: |
+          deb=$(packaging/build-deb.sh)
+          echo "DEB=$deb" >>"$GITHUB_ENV"
+      - name: Install it as a user would (apt resolves Depends)
+        run: |
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
+            -o Dir::Cache::Archives="$HOME/apt-archives" "$DEB" python3-pytest
+      - name: Load the AppArmor profile
+        run: |
+          sudo apparmor_parser -r -T -W /etc/apparmor.d/sovander
+          sudo grep -xF 'sovander (enforce)' /sys/kernel/security/apparmor/profiles
+      - name: Packaging tests on the installed system
+        run: python3 -m pytest -rs tests/packaging
+      - name: Uninstalling leaves nothing behind (13.4)
+        run: |
+          sudo apt-get purge -y -qq sovander
+          for path in /usr/bin/sovander /usr/lib/sovander /usr/share/sovander /etc/apparmor.d/sovander; do
+            if [ -e "$path" ]; then echo "left behind: $path"; exit 1; fi
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: deb-${{ matrix.os }}
+          path: dist/*.deb
+          if-no-files-found: error
+          retention-days: 14
+
+  offline:
+    needs: package
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: deb-${{ matrix.os }}
+          path: dist
+      - name: Restore downloaded packages
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-installed-${{ hashFiles('packaging/debian/control') }}
+          restore-keys: apt-${{ matrix.os }}-installed-
+      - name: Install the .deb the package job tested
+        run: |
+          debs=(dist/sovander_*_all.deb)
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq -o Dir::Cache::Archives="$HOME/apt-archives" "./${debs[0]}" python3-pytest
+      - name: Load the AppArmor profile
+        run: sudo apparmor_parser -r -T -W /etc/apparmor.d/sovander
+      - name: Offline gate (9.8)
+        run: tests/offline/run-gate.sh

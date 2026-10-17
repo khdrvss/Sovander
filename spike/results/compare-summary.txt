@@ -1,0 +1,26 @@
+## Robustness: rendered without error or timeout
+docx    A    82% (50/61)   B    84% (51/61)
+doc     A    93% (14/15)   B   100% (15/15)
+pptx    A    90% (27/30)   B    83% (25/30)
+xlsx    A    97% (29/30)   B    90% (27/30)
+gander  A   100% (13/13)   B   100% (13/13)
+
+## Pagination vs Word's own page count (Word-saved .docx, both rendered ok)
+all                  A: exact 94% (45/48), within 1 page 96% (46/48)
+all                  B: exact 94% (45/48), within 1 page 96% (46/48)
+A had Word's breaks  A: exact 90% (9/10), within 1 page 90% (9/10)
+A had Word's breaks  B: exact 80% (8/10), within 1 page 90% (9/10)
+A on its own         A: exact 95% (36/38), within 1 page 97% (37/38)
+A on its own         B: exact 97% (37/38), within 1 page 97% (37/38)
+
+## Spreadsheet cell fills shown (workbooks where B's grid shows fills)
+workbooks with fills (per B): 14; A showed fills in 0 of them
+
+## Slides: elements A left out
+decks 33; decks with missing boxes 8; boxes total 16
+
+## Text recall (share of the file's own words shown), mean over files both rendered
+docx    n= 40  A 82.8% (files <90%: 12)   B 95.8% (files <90%: 5)
+pptx    n= 21  A 95.5% (files <90%: 2)   B 95.3% (files <90%: 2)
+xlsx    n= 19  A 100.0% (files <90%: 0)   B 90.6% (files <90%: 3)
+gander  n= 10  A 99.8% (files <90%: 0)   B 99.2% (files <90%: 0)

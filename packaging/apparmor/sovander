@@ -1,0 +1,167 @@
+# AppArmor profile for Sovander, the offline document viewer. AGPL-3.0-or-later.
+#
+# The promise (Requirements 9.1, 9.7): Sovander and every process it starts have no internet.
+# /usr/bin/sovander enters this profile with aa-exec, and every program the app starts inherits it
+# (ix): the LibreOffice engine, WebKit's helper processes and their bubblewrap sandbox included.
+# Only IP is closed. Local desktop plumbing stays open: reading files, unix sockets (Wayland, X11,
+# D-Bus, the engine's UNO pipe) and the session bus with its portals.
+#
+# What is not allowed is denied: AppArmor allows nothing a profile does not grant, so every other
+# socket family (packet, vsock, bluetooth...) is closed too. The deny rules below make the internet
+# part explicit and win over any allow rule, including one an included abstraction might add.
+#
+# One file for AppArmor 3.0 (Ubuntu 22.04) and 4.0 (24.04). Lines starting "#abi4# " are rules that
+# only AppArmor 4 parses. packaging/build-deb.sh writes a second variant, sovander.abi4, with
+# "abi <abi/4.0>," and those lines switched on; the package's postinst installs that variant when
+# the system's apparmor_parser compiles it and this one otherwise.
+#
+# Writes are limited to Sovander's own folders, toolkit caches and temporary files, so a document
+# the user opens can never be changed (9.9), and nothing can be planted where the desktop would run
+# it later outside this profile (autostart, ~/.local/share/applications, shell start files).
+#
+# Site-specific additions: /etc/apparmor.d/local/sovander (never needed for normal use).
+
+abi <abi/3.0>,
+
+include <tunables/global>
+
+# Everything Sovander and its helpers may write in the home folder
+@{sovander_home_rw} = @{HOME}/.cache/sovander @{HOME}/.local/share/sovander
+@{sovander_home_rw} += @{HOME}/.cache/io.github.khdrvss.Sovander @{HOME}/.local/share/io.github.khdrvss.Sovander
+@{sovander_home_rw} += @{HOME}/.cache/fontconfig @{HOME}/.cache/mesa_shader_cache @{HOME}/.cache/mesa_shader_cache_db
+@{sovander_home_rw} += @{HOME}/.cache/gtk-4.0 @{HOME}/.cache/gstreamer-1.0 @{HOME}/.cache/nvidia @{HOME}/.nv
+@{sovander_home_rw} += @{HOME}/.cache/webkitgtk @{HOME}/.local/share/webkitgtk
+
+profile sovander flags=(attach_disconnected) {
+  include <abstractions/base>
+
+  # No internet for Sovander or anything it starts (9.1, 9.7)
+  deny network inet,
+  deny network inet6,
+
+  # Local sockets: display server, D-Bus, the engine's UNO pipe; netlink for GLib's network monitor
+  unix,
+  network unix,
+  network netlink,
+
+  # D-Bus on every bus: settings, accessibility, and the desktop portal that hands a confirmed web
+  # link to the browser outside this profile (9.4). It is a message bus, not an internet socket.
+  dbus,
+
+  signal (send, receive) peer=sovander{,//*},
+  signal (receive) peer=unconfined,
+  ptrace (read, readby) peer=sovander{,//*},
+
+  # Reading: the user may open any file; the toolkit, Python and the engine read the system
+  /** r,
+  # Code is loaded only from the system, never from the home folder or a document
+  /usr/** rm,
+
+  # Credentials and browser profiles are never a document. Because a web link can leave through the
+  # portal, keeping them unreadable means a hostile file has no secret to slip into one
+  deny @{HOME}/{.ssh,.gnupg,.pki,.password-store,.mozilla,snap/firefox,.local/share/keyrings}/** rw,
+  deny @{HOME}/.config/{google-chrome,chromium,BraveSoftware}/** rw,
+
+  # Printing: the system's print service on its local socket, used only when the user prints. Without
+  # it the print dialog lists no printers. CUPS, outside this profile, reaches any network printer.
+  /run/cups/cups.sock rw,
+
+  # Writing (9.9, 9.10)
+  owner @{sovander_home_rw}/ rw,
+  owner @{sovander_home_rw}/** rwk,
+  owner @{HOME}/.local/share/recently-used.xbel{,.*} rw,
+  owner /tmp/** rwkl,
+  owner /var/tmp/** rwkl,
+  /tmp/.X11-unix/* rw,
+  owner /dev/shm/** rwk,
+  owner /run/user/[0-9]*/** rwk,
+  # Files in the document portal and network mounts are the user's documents: read only
+  deny /run/user/[0-9]*/{doc,gvfs}/** wl,
+  # LibreOffice's UNO bridge may map its code thunks from a temporary file
+  owner @{HOME}/.execooo* rwm,
+  owner /tmp/.execooo* rwm,
+
+  # Devices: the GPU for drawing, the terminal for log output
+  /dev/dri/** rw,
+  /dev/nvidia* rw,
+  owner /dev/pts/[0-9]* rw,
+  /dev/tty rw,
+
+  owner @{PROC}/@{pid}/{comm,oom_score_adj} rw,
+  owner @{PROC}/@{pid}/task/@{tid}/comm rw,
+
+  # Programs Sovander starts, all kept under these rules (ix)
+  /usr/bin/python3.[0-9]* ix,
+  /usr/lib/libreoffice/program/* ix,
+  # The LibreOffice start script and the tools it calls; ldconfig for Python's ctypes. Both /bin
+  # and /usr/bin: a 22.04 upgraded from an older release may not have merged /usr
+  /{,usr/}bin/{sh,dash,bash,awk,mawk,gawk,basename,dirname,grep,ls,sed,uname} ix,
+  /{,usr/}sbin/ldconfig{,.real} ix,
+  /usr/lib/*-linux-gnu/webkitgtk-6.0/* ix,
+  # WebKit's own sandbox: bubblewrap needs namespaces and mounts, kept in a child profile
+  /usr/bin/bwrap Cx -> bwrap,
+
+  include if exists <local/sovander>
+
+  # bubblewrap puts WebKit's web and helper processes in their own namespaces. Capabilities here
+  # exist only inside the user namespace bwrap creates: bwrap is not setuid on Ubuntu, sets
+  # no_new_privs and drops every capability before it starts a WebKit process.
+  profile bwrap flags=(attach_disconnected,mediate_deleted) {
+    include <abstractions/base>
+
+    deny network inet,
+    deny network inet6,
+    unix,
+    network unix,
+    # bwrap brings up loopback in a new network namespace over netlink
+    network netlink,
+    dbus,
+
+    signal (send, receive) peer=sovander{,//*},
+    signal (receive) peer=unconfined,
+    ptrace (read, readby) peer=sovander{,//*},
+
+    #abi4# userns,
+    capability,
+    mount,
+    umount,
+    pivot_root,
+
+    /** r,
+    /usr/** rm,
+    deny @{HOME}/{.ssh,.gnupg,.pki,.password-store,.mozilla,snap/firefox,.local/share/keyrings}/** rw,
+    deny @{HOME}/.config/{google-chrome,chromium,BraveSoftware}/** rw,
+
+    owner @{sovander_home_rw}/ rw,
+    owner @{sovander_home_rw}/** rwk,
+    # bwrap builds the sandbox root on a fresh tmpfs at /tmp or $XDG_RUNTIME_DIR/.bubblewrap
+    owner /tmp/** rwkl,
+    # ...and after pivot_root that tmpfs is "/", the root being built is /newroot (the kernel logged
+    # "mkdir /newroot/usr/" and "mknod /newroot/dev/null" denied, and every book crashed the app).
+    # /newroot exists only inside bwrap's own mount namespace; outside, creating it needs root.
+    /newroot/ rw,
+    /newroot/** rwkl,
+    # it then opens that tmpfs root itself to pivot into /newroot ("can't open /"); /** does not cover /
+    / r,
+    # and keeps the data of --ro-bind-data (WebKit's /.flatpak-info) in a file it makes on that root.
+    # Traced (strace -f of WebKit's bwrap): every other write is under /newroot, /tmp or /proc/<pid>.
+    /bindfile* rw,
+    owner /var/tmp/** rwkl,
+    /tmp/.X11-unix/* rw,
+    owner /dev/shm/** rwk,
+    owner /run/user/[0-9]*/** rwkl,
+    deny /run/user/[0-9]*/{doc,gvfs}/** wl,
+    /dev/dri/** rw,
+    /dev/nvidia* rw,
+    owner /dev/pts/[0-9]* rw,
+
+    owner @{PROC}/@{pid}/{uid_map,gid_map,setgroups,comm,oom_score_adj} rw,
+    owner @{PROC}/@{pid}/task/@{tid}/comm rw,
+
+    /usr/bin/bwrap ix,
+    /usr/bin/xdg-dbus-proxy ix,
+    /usr/lib/*-linux-gnu/webkitgtk-6.0/* ix,
+
+    include if exists <local/sovander-bwrap>
+  }
+}

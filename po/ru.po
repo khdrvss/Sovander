@@ -1,0 +1,560 @@
+# Russian translation of Sovander.
+# Copyright (C) 2026 Saidxon Xaydarov
+# This file is distributed under the same licence as Sovander (AGPL-3.0-or-later).
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: sovander 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-17 12:00+0000\n"
+"PO-Revision-Date: 2026-10-17 12:00+0000\n"
+"Last-Translator: Saidxon Xaydarov <saidxon3105@gmail.com>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. Translators: About window and status: the operating system blocks all network access for the app
+msgid "Offline: verified by the system"
+msgstr "Офлайн: подтверждено системой"
+
+msgid "Offline protection is off: the network is not blocked"
+msgstr "Офлайн-защита выключена: доступ к сети не заблокирован"
+
+msgid "Offline protection could not be checked"
+msgstr "Не удалось проверить офлайн-защиту"
+
+msgid "Shown as text, unknown format"
+msgstr "Показано как текст: формат неизвестен"
+
+#. Translators: Button under a large text file: loads the next part
+msgid "Show more"
+msgstr "Показать ещё"
+
+#. Translators: Sizes, for example: Showing 5.0 MB of 12.3 MB
+#, python-brace-format
+msgid "Showing {shown} of {total}"
+msgstr "Показано {shown} из {total}"
+
+#. Translators: Megabytes
+#, python-brace-format
+msgid "{size} MB"
+msgstr "{size} МБ"
+
+msgid "This image cannot be shown"
+msgstr "Не удаётся показать изображение"
+
+msgid "This image format is not supported"
+msgstr "Этот формат изображений не поддерживается"
+
+#. Translators: {format} is HEIC, AVIF, PNG and so on
+#, python-brace-format
+msgid "No decoder for {format} images is installed"
+msgstr "Не установлен декодер изображений {format}"
+
+msgid "This image is damaged"
+msgstr "Изображение повреждено"
+
+msgid "This image is too large to open safely"
+msgstr "Изображение слишком большое, чтобы безопасно его открыть"
+
+msgid "This PDF needs a password"
+msgstr "Для этого PDF нужен пароль"
+
+msgid "More pages are loading…"
+msgstr "Остальные страницы загружаются…"
+
+#. Translators: Title of the full-screen slide show window
+msgid "Presentation"
+msgstr "Презентация"
+
+msgid "No matches"
+msgstr "Совпадений нет"
+
+#. Translators: Search result counter, for example: 3 of 17
+#, python-brace-format
+msgid "{current} of {total}"
+msgstr "{current} из {total}"
+
+msgid "Match Case"
+msgstr "Учитывать регистр"
+
+msgid "View as Text"
+msgstr "Показать как текст"
+
+msgid "This format is not supported"
+msgstr "Этот формат не поддерживается"
+
+#, python-brace-format
+msgid "Cannot open “{name}”: {reason}"
+msgstr "Не удалось открыть «{name}»: {reason}"
+
+msgid "The file does not exist"
+msgstr "Файл не существует"
+
+msgid "No permission to read the file"
+msgstr "Нет прав на чтение файла"
+
+msgid "This file is damaged"
+msgstr "Файл повреждён"
+
+msgid "This file is damaged. Showing the readable part."
+msgstr "Файл повреждён. Показана читаемая часть."
+
+msgid "This file is password protected"
+msgstr "Файл защищён паролем"
+
+msgid "Enter its password to open it."
+msgstr "Введите пароль, чтобы открыть его."
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "Open"
+msgstr "Открыть"
+
+msgid "That password did not work."
+msgstr "Пароль не подошёл."
+
+msgid "Too large to open safely"
+msgstr "Слишком большой, чтобы безопасно открыть"
+
+msgid "Install the document engine"
+msgstr "Установите движок документов"
+
+#, python-brace-format
+msgid "Office files need the document engine. Install it with: {command}"
+msgstr "Для офисных файлов нужен движок документов. Установите его командой: {command}"
+
+msgid "The document engine stopped while opening this file"
+msgstr "Движок документов остановился при открытии этого файла"
+
+msgid "This document contains macros. They were not run."
+msgstr "Документ содержит макросы. Они не запускались."
+
+msgid "Remote image not loaded"
+msgstr "Внешнее изображение не загружено"
+
+msgid "Open this web address?"
+msgstr "Открыть этот веб-адрес?"
+
+msgid "Open in Browser"
+msgstr "Открыть в браузере"
+
+msgid "Copy Address"
+msgstr "Копировать адрес"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+#, python-brace-format
+msgid "Page {page} of {total}"
+msgstr "Страница {page} из {total}"
+
+#, python-brace-format
+msgid "Slide {slide} of {total}"
+msgstr "Слайд {slide} из {total}"
+
+msgid "Go to Page"
+msgstr "Перейти к странице"
+
+msgid "Fit Width"
+msgstr "По ширине"
+
+msgid "Fit Page"
+msgstr "Страница целиком"
+
+msgid "Zoom In"
+msgstr "Увеличить"
+
+msgid "Zoom Out"
+msgstr "Уменьшить"
+
+msgid "Best Fit"
+msgstr "Вписать в окно"
+
+msgid "Original Size"
+msgstr "Исходный размер"
+
+msgid "More slides are loading…"
+msgstr "Остальные слайды загружаются…"
+
+msgid "Recent Files"
+msgstr "Недавние файлы"
+
+#. Translators: A recent file that is no longer where it was
+msgid "Missing"
+msgstr "Не найден"
+
+msgid "Remove from List"
+msgstr "Убрать из списка"
+
+msgid "Clear History"
+msgstr "Очистить историю"
+
+msgid "Keep History"
+msgstr "Сохранять историю"
+
+msgid "Night Mode"
+msgstr "Ночной режим"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Same as the System"
+msgstr "Как в системе"
+
+msgid "Open…"
+msgstr "Открыть…"
+
+msgid "Print…"
+msgstr "Печать…"
+
+msgid "Find"
+msgstr "Найти"
+
+msgid "Presentation Mode"
+msgstr "Режим презентации"
+
+#. Translators: Menu in the archive browser: which code page the file names are read in
+msgctxt "zip archive"
+msgid "Name Encoding"
+msgstr "Кодировка имён"
+
+#, python-brace-format
+msgid "{n} page"
+msgid_plural "{n} pages"
+msgstr[0] "{n} страница"
+msgstr[1] "{n} страницы"
+msgstr[2] "{n} страниц"
+
+#. Translators: Link dialog heading when the address can only be copied
+msgid "Copy this address?"
+msgstr "Скопировать этот адрес?"
+
+#. Translators: Link dialog: the web site a link leads to, in its encoded (punycode) form
+#, python-brace-format
+msgid "Site: {host}"
+msgstr "Сайт: {host}"
+
+#, python-brace-format
+msgid "The site name has non-Latin letters ({name}), so it is shown encoded. Look-alike letters can imitate a familiar site."
+msgstr "В имени сайта есть нелатинские буквы ({name}), поэтому оно показано в закодированном виде. Похожие буквы могут подделать знакомый сайт."
+
+#, python-brace-format
+msgid "The text before “@” is not the site. This link goes to {host}."
+msgstr "Текст перед «@» — не сайт. Ссылка ведёт на {host}."
+
+msgid "This address is too long to show in full, so it can only be copied."
+msgstr "Адрес слишком длинный, чтобы показать его целиком, поэтому его можно только скопировать."
+
+msgid "This address is malformed, so it can only be copied."
+msgstr "Адрес записан с ошибками, поэтому его можно только скопировать."
+
+msgid "Only web and email addresses can be opened from a document."
+msgstr "Из документа можно открывать только веб-адреса и адреса электронной почты."
+
+msgid "The browser cannot be started from here: the desktop portal is not available. Copy the address and paste it into your browser."
+msgstr "Отсюда нельзя запустить браузер: портал рабочего стола недоступен. Скопируйте адрес и вставьте его в браузер."
+
+#. Translators: {reason} is a system error message, usually in English
+#, python-brace-format
+msgid "The browser could not be started ({reason}). Copy the address and paste it into your browser."
+msgstr "Не удалось запустить браузер ({reason}). Скопируйте адрес и вставьте его в браузер."
+
+#. Translators: Placeholder in the search field
+msgid "Find in document"
+msgstr "Найти в документе"
+
+msgid "Previous match"
+msgstr "Предыдущее совпадение"
+
+msgid "Next match"
+msgstr "Следующее совпадение"
+
+msgid "Loading spreadsheet…"
+msgstr "Загрузка таблицы…"
+
+msgid "Formatting…"
+msgstr "Форматирование…"
+
+msgid "The full spreadsheet could not be prepared. Showing the first rows as stored in the file."
+msgstr "Не удалось подготовить всю таблицу. Показаны первые строки в том виде, в каком они хранятся в файле."
+
+msgid "This sheet cannot be shown"
+msgstr "Этот лист не удаётся показать"
+
+msgid "This sheet is empty"
+msgstr "Этот лист пуст"
+
+# Home screen (sovander/home.py)
+
+#. Translators: Title of the home screen when no file has been opened yet
+msgid "No Recent Files"
+msgstr "Нет недавних файлов"
+
+msgid "Files you open appear here. Open a file or drop one on this window."
+msgstr "Здесь появятся открытые вами файлы. Откройте файл или перетащите его в это окно."
+
+#. Translators: Title of the home screen while history is switched off
+msgid "History Is Off"
+msgstr "История отключена"
+
+msgid "Sovander does not remember the files you open, where you stopped reading or their thumbnails. Turn on Keep History to start."
+msgstr "Sovander не запоминает открытые файлы, место, где вы остановились, и миниатюры. Включите «Сохранять историю», чтобы начать."
+
+#. Translators: Tooltip of the menu button on a recent file
+msgid "More Options"
+msgstr "Другие действия"
+
+#. Translators: Title of the confirmation before forgetting all recent files
+msgid "Clear History?"
+msgstr "Очистить историю?"
+
+msgid "Sovander will forget every recent file, where you stopped reading and every thumbnail. The files themselves are not touched."
+msgstr "Sovander забудет все недавние файлы, места, где вы остановились, и все миниатюры. Сами файлы не затрагиваются."
+
+#. Translators: When a recent file was opened; {time} is like 14:05
+#, python-brace-format
+msgid "Today, {time}"
+msgstr "Сегодня, {time}"
+
+#, python-brace-format
+msgid "Yesterday, {time}"
+msgstr "Вчера, {time}"
+
+# Archive browser (sovander/views/archive_view.py)
+
+#. Translators: Tooltip: go to the folder above in a zip archive
+msgid "Up"
+msgstr "Вверх"
+
+#. Translators: Tooltip of the button that hides an error message
+msgid "Hide This Message"
+msgstr "Скрыть сообщение"
+
+#. Translators: Column of the zip archive list
+msgid "Name"
+msgstr "Имя"
+
+#. Translators: Column of the zip archive list
+msgid "Size"
+msgstr "Размер"
+
+#. Translators: Column of the zip archive list: when the file was last changed
+msgid "Modified"
+msgstr "Изменён"
+
+#. Translators: File name encoding: guess it from the names
+msgid "Automatic"
+msgstr "Автоматически"
+
+msgid "Sovander cannot unpack this file: its compression or encryption is not supported"
+msgstr "Sovander не может распаковать этот файл: его сжатие или шифрование не поддерживается"
+
+#. Translators: Code page names in the Name Encoding menu, followed by the code page, like (CP866)
+msgid "Unicode"
+msgstr "Юникод"
+
+msgid "Cyrillic, DOS"
+msgstr "Кириллица, DOS"
+
+msgid "Cyrillic, Windows"
+msgstr "Кириллица, Windows"
+
+msgid "Western, DOS (US)"
+msgstr "Западная, DOS (США)"
+
+msgid "Western, DOS"
+msgstr "Западная, DOS"
+
+msgid "Chinese, Simplified"
+msgstr "Китайская, упрощённая"
+
+msgid "Japanese"
+msgstr "Японская"
+
+msgid "Chinese, Traditional"
+msgstr "Китайская, традиционная"
+
+msgid "Korean"
+msgstr "Корейская"
+
+msgid "Central European, DOS"
+msgstr "Центральноевропейская, DOS"
+
+msgid "Greek, DOS"
+msgstr "Греческая, DOS"
+
+msgid "Turkish, DOS"
+msgstr "Турецкая, DOS"
+
+msgid "Hebrew, DOS"
+msgstr "Иврит, DOS"
+
+msgid "Arabic, DOS"
+msgstr "Арабская, DOS"
+
+msgid "Thai"
+msgstr "Тайская"
+
+msgid "Baltic, DOS"
+msgstr "Балтийская, DOS"
+
+msgid "Vietnamese"
+msgstr "Вьетнамская"
+
+# About window (sovander/about.py)
+
+msgid "Reads office documents, PDFs, books and images. Never edits them, never goes online."
+msgstr "Показывает офисные документы, PDF, книги и изображения. Никогда их не изменяет и не выходит в интернет."
+
+#. Translators: {label} is the AppArmor profile name and mode, like: sovander (enforce)
+#, python-brace-format
+msgid "AppArmor profile: {label}"
+msgstr "Профиль AppArmor: {label}"
+
+msgid "AppArmor: not available"
+msgstr "AppArmor: недоступен"
+
+msgid "Sovander is free software under the GNU Affero General Public License, version 3 or later. The full texts of its licence and of the licences of the parts it bundles follow."
+msgstr "Sovander — свободная программа под лицензией GNU Affero General Public License версии 3 или более поздней. Ниже приведены полные тексты её лицензии и лицензий входящих в неё компонентов."
+
+#. Translators: {files} is a list of file paths
+#, python-brace-format
+msgid "These licence files are missing from this installation: {files}"
+msgstr "В этой установке нет файлов лицензий: {files}"
+
+#. Translators: Credits section: the project Sovander's approach and code come from
+msgid "Based on"
+msgstr "Основано на"
+
+#. Translators: Credits section
+msgid "Document engines"
+msgstr "Движки документов"
+
+#. Translators: Credits section
+msgid "Bundled libraries"
+msgstr "Встроенные библиотеки"
+
+#. Translators: Credits section
+msgid "Fonts"
+msgstr "Шрифты"
+
+# Printing (sovander/print.py)
+
+msgid "This document cannot be printed"
+msgstr "Этот документ нельзя напечатать"
+
+#. Translators: Shown while a document is being read or prepared
+msgid "Opening…"
+msgstr "Открытие…"
+
+msgid "The document took too long to prepare and was stopped"
+msgstr "Документ готовился слишком долго, и его подготовка остановлена"
+
+msgid "This file could not be opened"
+msgstr "Этот файл не удалось открыть"
+
+#. Translators: Menu item that toggles full screen (F11)
+msgid "Full Screen"
+msgstr "Во весь экран"
+
+msgid "About Sovander"
+msgstr "О программе Sovander"
+
+#. Translators: Tooltip of the button that hides the offline-protection warning
+msgid "Dismiss"
+msgstr "Скрыть"
+
+#. Translators: File chooser filter
+msgid "Supported Files"
+msgstr "Поддерживаемые файлы"
+
+#. Translators: File chooser filter
+msgid "All Files"
+msgstr "Все файлы"
+
+#. Translators: Language menu item that follows the desktop's language
+msgid "System Language"
+msgstr "Язык системы"
+
+# Book and Markdown pages (data/assets): web_words.py hands them to the page
+
+#. Translators: Title of the page that shows an EPUB book
+msgctxt "book page"
+msgid "Book"
+msgstr "Книга"
+
+msgid "Opening book…"
+msgstr "Открытие книги…"
+
+#. Translators: Shown while a Markdown file is being formatted
+msgid "Rendering…"
+msgstr "Подготовка…"
+
+#. Translators: Button and heading of a book's table of contents
+msgctxt "book page"
+msgid "Contents"
+msgstr "Оглавление"
+
+#. Translators: Button: the previous chapter of a book
+msgctxt "book page"
+msgid "Previous"
+msgstr "Предыдущая"
+
+#. Translators: Button: the next chapter of a book
+msgctxt "book page"
+msgid "Next"
+msgstr "Следующая"
+
+#. Translators: Button that closes a book's table of contents
+msgctxt "book page"
+msgid "Close"
+msgstr "Закрыть"
+
+#, python-brace-format
+msgid "Could not read the file (HTTP {status})"
+msgstr "Не удалось прочитать файл (HTTP {status})"
+
+msgid "Something went wrong while rendering"
+msgstr "При отображении что-то пошло не так"
+
+msgid "Could not render this Markdown file"
+msgstr "Не удалось отобразить этот файл Markdown"
+
+msgid "Could not open this book"
+msgstr "Не удалось открыть книгу"
+
+msgid "It is not an EPUB, or the file is damaged."
+msgstr "Это не EPUB, или файл повреждён."
+
+msgid "This book is locked"
+msgstr "Книга защищена"
+
+msgid "It is protected against copying (DRM), so only the app of the shop or library it came from can open it."
+msgstr "Она защищена от копирования (DRM): открыть её может только приложение магазина или библиотеки, откуда она получена."
+
+msgid "The book does not say where its chapters are listed."
+msgstr "В книге не указано, где находится список глав."
+
+msgid "The book lists no chapters."
+msgstr "В книге нет ни одной главы."
+
+#. Translators: {path} is a file inside the book
+#, python-brace-format
+msgid "The book has no {path}"
+msgstr "В книге нет файла {path}"
+
+msgid "One of the book's own files is not sound XML."
+msgstr "Один из файлов книги содержит ошибочный XML."
+
+#. Translators: A book chapter named by its number when the book has no contents
+#, python-brace-format
+msgid "Part {n}"
+msgstr "Часть {n}"
+
+msgid "This part of the book could not be read."
+msgstr "Эту часть книги не удалось прочитать."

@@ -1,0 +1,3 @@
+Plain text, opened by the text viewer.
+A second line so the newline handling is visible.
+An accented character: café.

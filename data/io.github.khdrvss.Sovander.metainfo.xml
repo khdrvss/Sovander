@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Saidxon Xaydarov -->
+<component type="desktop-application">
+  <id>io.github.khdrvss.Sovander</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+  <name>Sovander</name>
+  <summary>Read Office files, PDFs, books and images offline</summary>
+  <summary xml:lang="ru">Просмотр файлов Office, PDF, книг и изображений без интернета</summary>
+  <description>
+    <p>
+      Sovander opens the files people receive every day: Word, Excel, PowerPoint, OpenDocument, PDF,
+      EPUB books, Markdown, text, images and zip archives. It only shows them: it never edits a file,
+      needs no account and never goes online.
+    </p>
+    <p xml:lang="ru">
+      Sovander открывает файлы, которые приходят каждый день: Word, Excel, PowerPoint, OpenDocument, PDF,
+      книги EPUB, Markdown, текст, изображения и zip-архивы. Он только показывает их: никогда не меняет файл,
+      не требует учётной записи и не выходит в интернет.
+    </p>
+    <p>
+      The operating system denies Sovander and every process it starts any network access, and the app
+      checks that at start and shows the result.
+    </p>
+    <p xml:lang="ru">
+      Операционная система запрещает Sovander и всем запущенным им процессам доступ к сети, а приложение
+      проверяет это при запуске и показывает результат.
+    </p>
+  </description>
+  <url type="homepage">https://github.com/khdrvss/Sovander</url>
+  <url type="bugtracker">https://github.com/khdrvss/Sovander/issues</url>
+  <url type="vcs-browser">https://github.com/khdrvss/Sovander</url>
+  <url type="contribute">https://github.com/khdrvss/Sovander/blob/main/CONTRIBUTING.md</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>A Word report</caption>
+      <caption xml:lang="ru">Отчёт Word</caption>
+      <image type="source" width="1200" height="780">https://raw.githubusercontent.com/khdrvss/Sovander/main/docs/screenshots/en/document.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>A spreadsheet with fills and formulas</caption>
+      <caption xml:lang="ru">Таблица с заливками и формулами</caption>
+      <image type="source" width="1200" height="780">https://raw.githubusercontent.com/khdrvss/Sovander/main/docs/screenshots/en/spreadsheet.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>A presentation</caption>
+      <caption xml:lang="ru">Презентация</caption>
+      <image type="source" width="1200" height="780">https://raw.githubusercontent.com/khdrvss/Sovander/main/docs/screenshots/en/slides.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>An EPUB book</caption>
+      <caption xml:lang="ru">Книга EPUB</caption>
+      <image type="source" width="1200" height="780">https://raw.githubusercontent.com/khdrvss/Sovander/main/docs/screenshots/en/book.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Recent files with previews</caption>
+      <caption xml:lang="ru">Недавние файлы с миниатюрами</caption>
+      <image type="source" width="1200" height="780">https://raw.githubusercontent.com/khdrvss/Sovander/main/docs/screenshots/en/home.png</image>
+    </screenshot>
+  </screenshots>
+  <launchable type="desktop-id">io.github.khdrvss.Sovander.desktop</launchable>
+  <developer id="io.github.khdrvss">
+    <name>Saidxon Xaydarov</name>
+  </developer>
+  <categories>
+    <category>Office</category>
+    <category>Viewer</category>
+  </categories>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </supports>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2026-10-18">
+      <url type="details">https://github.com/khdrvss/Sovander/releases/tag/v0.1.0</url>
+      <description>
+        <p>The first release: a view-only, offline viewer for Office files, PDFs, books, text, images and zip
+        archives, with layout by LibreOffice's engine and pages drawn by MuPDF.</p>
+        <ul>
+          <li>The network is denied by an AppArmor profile, and a start-up check shows when it is not</li>
+          <li>Large spreadsheets show their first screen at once</li>
+          <li>Find, night mode, zoom, slide show, printing and recent files with previews</li>
+          <li>English and Russian interface</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

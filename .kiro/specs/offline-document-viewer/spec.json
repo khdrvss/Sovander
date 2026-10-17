@@ -1,0 +1,10 @@
+{
+  "feature": "offline-document-viewer",
+  "mode": "feature",
+  "workflow": "requirements-first",
+  "language": "en",
+  "phase": "design",
+  "approvals": { "requirements": true, "design": false, "tasks": false },
+  "created": "2026-10-17",
+  "updated": "2026-10-17"
+}

@@ -1,0 +1,197 @@
+# Nightly fidelity, fuzz and performance runs (task 6.3; NFR Fidelity, Robustness, Performance).
+#
+#   fidelity     the spike's corpus (scripts/fetch-corpus.sh, pinned by sha256) through the engine;
+#                fails below the spike's floors (Word text >= 95%, 14/14 workbooks keep colours)
+#   fuzz         router and zip reader, 10,000 malformed files per format family
+#   fuzz-engine  Word, spreadsheet and slide files through the engine, one job per family, up to
+#                10,000 cases each or the time budget, whichever comes first (report says which)
+#   perf         time to first page, cold and warm; CI ceilings only (targets: SOVANDER_PERF_REFERENCE=1)
+#
+# Every job uploads its JSON report. Same rules as ci.yml: Ubuntu's own packages on the runner VMs,
+# actions pinned by commit SHA, read-only token.
+name: nightly
+
+on:
+  schedule:
+    - cron: "23 2 * * *"
+  workflow_dispatch:
+    inputs:
+      fuzz_iterations:
+        description: Malformed files per format family
+        default: "10000"
+      engine_fuzz_minutes:
+        description: Time budget per engine fuzz family, minutes (the job stops at 340)
+        default: "300"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTEST_ADDOPTS: "-p no:cacheprovider"
+  FUZZ_ITERATIONS: ${{ inputs.fuzz_iterations || '10000' }}
+  ENGINE_FUZZ_MINUTES: ${{ inputs.engine_fuzz_minutes || '300' }}
+  BASE_PACKAGES: python3-pytest python3-fitz python3-cryptography python3-charset-normalizer
+  ENGINE_PACKAGES: >-
+    python3-uno libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui
+    libreoffice-draw-nogui fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
+
+jobs:
+  fidelity:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Restore the corpus
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: spike/corpus
+          key: corpus-${{ hashFiles('tests/fidelity/corpus.lock') }}
+      - name: Fetch the corpus (every file checked against corpus.lock)
+        run: scripts/fetch-corpus.sh
+      - name: Restore downloaded packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-engine-${{ hashFiles('.github/workflows/nightly.yml') }}
+          restore-keys: apt-${{ matrix.os }}-engine-
+      - name: Install Ubuntu's packages
+        run: |
+          read -ra packages <<<"$BASE_PACKAGES $ENGINE_PACKAGES"
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
+            -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+      - name: Fidelity floors
+        env:
+          SOVANDER_REQUIRE_CORPUS: "1"
+          SOVANDER_REQUIRE_ENGINE: "1"
+        run: python3 -m pytest -rs -s tests/fidelity
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fidelity-${{ matrix.os }}
+          path: build/fidelity/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  fuzz:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Ubuntu's packages
+        run: |
+          read -ra packages <<<"$BASE_PACKAGES"
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends "${packages[@]}"
+      - name: Router and zip reader
+        run: |
+          [[ $FUZZ_ITERATIONS =~ ^[0-9]+$ ]] || { echo "fuzz_iterations must be a number"; exit 1; }
+          SOVANDER_FUZZ_ITERATIONS=$FUZZ_ITERATIONS python3 -m pytest -m "not engine" -rs tests/fuzz
+      - name: Keep the report and failing inputs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fuzz-${{ matrix.os }}
+          path: build/fuzz/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  fuzz-engine:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+        kind: [text, sheet, slides]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Restore downloaded packages
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-engine-${{ hashFiles('.github/workflows/nightly.yml') }}
+          restore-keys: apt-${{ matrix.os }}-engine-
+      - name: Install Ubuntu's packages
+        run: |
+          read -ra packages <<<"$BASE_PACKAGES $ENGINE_PACKAGES"
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+      - name: Engine fuzz, ${{ matrix.kind }}
+        env:
+          KIND: ${{ matrix.kind }}
+          SOVANDER_REQUIRE_ENGINE: "1"
+        run: |
+          [[ $FUZZ_ITERATIONS =~ ^[0-9]+$ && $ENGINE_FUZZ_MINUTES =~ ^[0-9]+$ ]] || { echo "inputs must be numbers"; exit 1; }
+          SOVANDER_FUZZ_ITERATIONS=$FUZZ_ITERATIONS SOVANDER_FUZZ_BUDGET_S=$((ENGINE_FUZZ_MINUTES * 60)) \
+            python3 -m pytest -rs -s "tests/fuzz/test_fuzz_engine.py::test_engine_survives_malformed_files[$KIND]"
+      - name: Keep the report and failing inputs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fuzz-engine-${{ matrix.os }}-${{ matrix.kind }}
+          path: build/fuzz/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  perf:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Restore the corpus
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: spike/corpus
+          key: corpus-${{ hashFiles('tests/fidelity/corpus.lock') }}
+      - name: Fetch the corpus (every file checked against corpus.lock)
+        run: scripts/fetch-corpus.sh
+      - name: Restore downloaded packages
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-engine-${{ hashFiles('.github/workflows/nightly.yml') }}
+          restore-keys: apt-${{ matrix.os }}-engine-
+      - name: Install Ubuntu's packages
+        run: |
+          read -ra packages <<<"$BASE_PACKAGES $ENGINE_PACKAGES"
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+      - name: Time to first page
+        env:
+          SOVANDER_REQUIRE_CORPUS: "1"
+          SOVANDER_REQUIRE_ENGINE: "1"
+        run: python3 -m pytest -rs -s tests/perf
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: perf-${{ matrix.os }}
+          path: build/perf/
+          if-no-files-found: ignore
+          retention-days: 30

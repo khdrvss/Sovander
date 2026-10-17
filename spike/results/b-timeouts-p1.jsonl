@@ -1,0 +1,7 @@
+{"mode": "env", "host": "ubuntu-GP75-Leopard-9SDK", "loadavg": [1.60498046875, 2.08837890625, 2.41015625], "MemAvailable_MB": 2053, "SwapTotal_MB": 12007, "SwapFree_MB": 0, "lo": "snap 377", "python": "3.12.3", "ts": 1792227814.977}
+{"mode": "warm-start", "startup_to_uno_ready_s": 9.568, "ts": 1792227824.545}
+{"mode": "warm-p1", "file": "bug65649.docx", "rep": 0, "status": "ok", "convert_s": 44.469, "pdf_pages": 1, "render_s": 0.02, "ttfp_s": 44.489, "load_s": 21.681, "export_s": 22.462, "close_s": 0.326, "ts": 1792227869.035}
+{"mode": "warm-p1", "file": "2411-Performance_Up.pptx", "rep": 0, "status": "ok", "convert_s": 16.232, "pdf_pages": 1, "render_s": 0.098, "ttfp_s": 16.33, "load_s": 3.875, "export_s": 12.171, "close_s": 0.185, "ts": 1792227885.365}
+{"mode": "warm-p1", "file": "keyframes.pptx", "rep": 0, "status": "ok", "convert_s": 10.121, "pdf_pages": 1, "render_s": 0.127, "ttfp_s": 10.249, "load_s": 2.062, "export_s": 7.931, "close_s": 0.128, "ts": 1792227895.614}
+{"mode": "warm-p1", "file": "53105.xlsx", "rep": 0, "status": "ok", "convert_s": 1.657, "pdf_pages": 1, "render_s": 0.001, "ttfp_s": 1.658, "load_s": 1.174, "export_s": 0.426, "close_s": 0.057, "ts": 1792227897.273}
+{"mode": "warm-p1", "file": "no_drawing_patriarch.xlsx", "rep": 0, "status": "ok", "convert_s": 18.662, "pdf_pages": 1, "render_s": 0.004, "ttfp_s": 18.666, "load_s": 18.275, "export_s": 0.36, "close_s": 0.026, "ts": 1792227915.939}

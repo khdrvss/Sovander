@@ -1,0 +1,7 @@
+sovander (0.1.0) UNRELEASED; urgency=medium
+
+  * First development build: an offline, read-only viewer for Office files,
+    PDF, EPUB, Markdown, text, images and zip archives, with the network
+    denied by AppArmor.
+
+ -- Saidxon Xaydarov <saidxon3105@gmail.com>  Sat, 17 Oct 2026 12:00:00 +0000

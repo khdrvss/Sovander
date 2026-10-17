@@ -1,0 +1,36 @@
+name: File shown wrongly
+description: A document, sheet, slide or book looks different from the original, or does not open.
+labels: [rendering]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you! The file itself is what helps most. If it is private, a copy with the private parts
+        replaced still shows the problem in most cases. Never attach anything you are not allowed to share.
+  - type: textarea
+    id: file
+    attributes:
+      label: The file
+      description: Attach it here (drag and drop), or explain how to make one that shows the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong
+      description: What Sovander shows, and how it should look. Screenshots of both help a lot.
+    validations:
+      required: true
+  - type: input
+    id: original
+    attributes:
+      label: Where it looks right
+      placeholder: e.g. Microsoft Word 365, LibreOffice 24.2, Adobe Reader
+  - type: input
+    id: versions
+    attributes:
+      label: Sovander and Ubuntu versions
+      description: Sovander's version is in the menu → About Sovander.
+      placeholder: e.g. Sovander 0.1.0 on Ubuntu 24.04
+    validations:
+      required: true

@@ -1,0 +1,10 @@
+#!/bin/sh
+# Removes the byte-compiled files postinst made (Requirement 13.4: nothing left behind).
+# The AppArmor profile is not unloaded here: unloading would leave a Sovander that is still running
+# unconfined. It stays in the kernel until the next reboot; postrm deletes its files.
+set -e
+
+# py3clean ships in python3-minimal, which every python3 install has
+py3clean /usr/lib/sovander/sovander
+
+exit 0

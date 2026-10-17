@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Gander's md.html (MIT, see LICENSES.md), its styles moved to md.css. The
+     Content-Security-Policy arrives as a response header: see CSP in sovander/views/web_view.py. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markdown</title>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="md.css">
+<script src="lib/marked.min.js"></script>
+<script src="lib/purify.min.js"></script>
+</head>
+<body>
+<div id="vw-status" class="vw-status vw-wait" data-vw-word="Rendering…">Rendering…</div>
+<article id="content" data-vw-find></article>
+<script src="app.js"></script>
+<script src="find.js"></script>
+<script src="md.js"></script>
+</body>
+</html>

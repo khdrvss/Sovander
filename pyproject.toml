@@ -1,0 +1,21 @@
+[project]
+name = "sovander"
+version = "0.1.0"
+description = "Offline, read-only document viewer for Ubuntu"
+license = { text = "AGPL-3.0-or-later" }
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+extend-exclude = ["spike"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "UP", "BLE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "engine: needs the LibreOffice document engine (run with scripts/dev-env.sh)",
+    "gui: needs a display (run under xvfb-run)",
+]

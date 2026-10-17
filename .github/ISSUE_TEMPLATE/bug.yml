@@ -1,0 +1,31 @@
+name: Bug
+description: Something does not work (a crash, a button that does nothing, a wrong message).
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open …
+        2. Click …
+  - type: textarea
+    id: log
+    attributes:
+      label: Output from a terminal (optional)
+      description: Start Sovander from a terminal with `SOVANDER_LOG=INFO sovander` and paste what it prints.
+      render: text
+  - type: input
+    id: versions
+    attributes:
+      label: Sovander and Ubuntu versions
+      placeholder: e.g. Sovander 0.1.0 on Ubuntu 22.04
+    validations:
+      required: true

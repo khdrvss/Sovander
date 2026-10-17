@@ -1,0 +1,15 @@
+name: Feature request
+description: Something Sovander should do. (It stays a viewer — editing is out of scope.)
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you need to do
+      description: The task or situation, in your own words. The "why" matters more than a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How it could work (optional)

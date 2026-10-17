@@ -1,0 +1,19 @@
+#!/bin/sh
+# Deletes the AppArmor profile postinst installed and the parser's compiled copies of it
+# (Requirement 13.4). dpkg does not track these files, so nothing else would remove them.
+# /etc/apparmor.d/local/sovander, if the administrator made one, is theirs and stays.
+set -e
+
+case "$1" in
+remove | purge | abort-install)
+    rm -f /etc/apparmor.d/sovander
+    rm -f /var/cache/apparmor/*/sovander /etc/apparmor.d/cache/sovander
+    ;;
+upgrade | failed-upgrade | abort-upgrade | disappear) ;;
+*)
+    echo "postrm called with unknown argument '$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

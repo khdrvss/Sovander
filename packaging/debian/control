@@ -1,0 +1,36 @@
+Package: sovander
+Version: @VERSION@
+Architecture: all
+Section: text
+Priority: optional
+Maintainer: Saidxon Xaydarov <saidxon3105@gmail.com>
+Installed-Size: @INSTALLED_SIZE@
+Depends: python3 (>= 3.10),
+ python3-gi,
+ gir1.2-gtk-4.0,
+ gir1.2-adw-1,
+ gir1.2-gtksource-5,
+ gir1.2-webkit-6.0,
+ python3-fitz,
+ python3-uno,
+ libreoffice-writer-nogui | libreoffice-writer,
+ libreoffice-calc-nogui | libreoffice-calc,
+ libreoffice-impress-nogui | libreoffice-impress,
+ libreoffice-draw-nogui | libreoffice-draw,
+ python3-cryptography,
+ python3-charset-normalizer,
+ fonts-crosextra-carlito,
+ fonts-crosextra-caladea,
+ fonts-liberation2,
+ apparmor,
+ heif-gdk-pixbuf,
+ libavif-gdk-pixbuf
+Description: offline, read-only document viewer
+ Sovander opens the files people receive every day: Word, Excel, PowerPoint,
+ OpenDocument, PDF, EPUB books, Markdown, text, images and zip archives. It
+ only shows them: it never edits a file, needs no account and never goes
+ online.
+ .
+ An AppArmor profile denies Sovander and every process it starts any network
+ access, and the app checks that at start. Office files are laid out by
+ LibreOffice running headless; PDFs are drawn by MuPDF.

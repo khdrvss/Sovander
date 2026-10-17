@@ -1,0 +1,1 @@
+{"id":9007199254740993,"app":"com.example.reader","screen":{"width":1080,"height":2376},"landscape":false,"tags":[],"nodes":[{"id":0,"parent":-1,"name":"android.widget.FrameLayout","text":null,"visible":true},{"id":1,"parent":0,"name":"android.widget.TextView","text":"café 😀","visible":true}],"notes":{}}

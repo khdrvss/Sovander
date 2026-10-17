@@ -1,0 +1,22 @@
+{"mode": "env", "host": "ubuntu-GP75-Leopard-9SDK", "loadavg": [1.7041015625, 2.42724609375, 2.5712890625], "MemAvailable_MB": 2373, "SwapTotal_MB": 12007, "SwapFree_MB": 0, "lo": "snap 377", "python": "3.12.3", "ts": 1792227583.558}
+{"mode": "pdf-cold", "file": "ragged-prose.pdf", "rep": 0, "status": "ok", "ttfp_s": 0.17, "pdf_pages": 1, "import_s": 0.092, "render_s": 0.011, "ts": 1792227583.728}
+{"mode": "pdf-cold", "file": "ragged-prose.pdf", "rep": 1, "status": "ok", "ttfp_s": 0.194, "pdf_pages": 1, "import_s": 0.109, "render_s": 0.01, "ts": 1792227583.922}
+{"mode": "pdf-warm", "file": "ragged-prose.pdf", "rep": 0, "status": "ok", "ttfp_s": 0.011, "render_s": 0.011, "pdf_pages": 1, "ts": 1792227583.933}
+{"mode": "pdf-warm", "file": "ragged-prose.pdf", "rep": 1, "status": "ok", "ttfp_s": 0.005, "render_s": 0.005, "pdf_pages": 1, "ts": 1792227583.939}
+{"mode": "cold", "file": "word-pages.docx", "rep": 0, "status": "ok", "convert_s": 8.892, "pdf_pages": 3, "render_s": 0.003, "ttfp_s": 8.896, "ts": 1792227592.835}
+{"mode": "cold", "file": "word-pages.docx", "rep": 1, "status": "ok", "convert_s": 7.336, "pdf_pages": 3, "render_s": 0.003, "ttfp_s": 7.339, "ts": 1792227600.174}
+{"mode": "cold", "file": "Willowmere Kickoff.pptx", "rep": 0, "status": "ok", "convert_s": 16.213, "pdf_pages": 3, "render_s": 0.06, "ttfp_s": 16.273, "ts": 1792227616.448}
+{"mode": "cold", "file": "Willowmere Kickoff.pptx", "rep": 1, "status": "ok", "convert_s": 15.606, "pdf_pages": 3, "render_s": 0.059, "ttfp_s": 15.665, "ts": 1792227632.113}
+{"mode": "cold-p1", "file": "word-pages.docx", "rep": 0, "status": "ok", "convert_s": 9.606, "pdf_pages": 1, "render_s": 0.003, "ttfp_s": 9.609, "ts": 1792227641.722}
+{"mode": "cold-p1", "file": "word-pages.docx", "rep": 1, "status": "ok", "convert_s": 7.748, "pdf_pages": 1, "render_s": 0.002, "ttfp_s": 7.75, "ts": 1792227649.473}
+{"mode": "cold-p1", "file": "Willowmere Kickoff.pptx", "rep": 0, "status": "ok", "convert_s": 11.047, "pdf_pages": 1, "render_s": 0.044, "ttfp_s": 11.09, "ts": 1792227660.564}
+{"mode": "cold-p1", "file": "Willowmere Kickoff.pptx", "rep": 1, "status": "ok", "convert_s": 9.987, "pdf_pages": 1, "render_s": 0.042, "ttfp_s": 10.028, "ts": 1792227670.592}
+{"mode": "warm-start", "startup_to_uno_ready_s": 7.129, "ts": 1792227677.721}
+{"mode": "warm", "file": "word-pages.docx", "rep": 0, "status": "ok", "convert_s": 1.232, "pdf_pages": 3, "render_s": 0.002, "ttfp_s": 1.235, "load_s": 1.174, "export_s": 0.043, "close_s": 0.015, "ts": 1792227678.956}
+{"mode": "warm", "file": "word-pages.docx", "rep": 1, "status": "ok", "convert_s": 0.295, "pdf_pages": 3, "render_s": 0.002, "ttfp_s": 0.298, "load_s": 0.243, "export_s": 0.042, "close_s": 0.01, "ts": 1792227679.254}
+{"mode": "warm", "file": "Willowmere Kickoff.pptx", "rep": 0, "status": "ok", "convert_s": 7.477, "pdf_pages": 3, "render_s": 0.042, "ttfp_s": 7.519, "load_s": 1.884, "export_s": 5.316, "close_s": 0.277, "ts": 1792227686.774}
+{"mode": "warm", "file": "Willowmere Kickoff.pptx", "rep": 1, "status": "ok", "convert_s": 7.121, "pdf_pages": 3, "render_s": 0.042, "ttfp_s": 7.163, "load_s": 1.685, "export_s": 5.323, "close_s": 0.112, "ts": 1792227693.938}
+{"mode": "warm-p1", "file": "word-pages.docx", "rep": 0, "status": "ok", "convert_s": 0.312, "pdf_pages": 1, "render_s": 0.002, "ttfp_s": 0.314, "load_s": 0.274, "export_s": 0.025, "close_s": 0.013, "ts": 1792227694.252}
+{"mode": "warm-p1", "file": "word-pages.docx", "rep": 1, "status": "ok", "convert_s": 0.313, "pdf_pages": 1, "render_s": 0.002, "ttfp_s": 0.315, "load_s": 0.281, "export_s": 0.022, "close_s": 0.01, "ts": 1792227694.568}
+{"mode": "warm-p1", "file": "Willowmere Kickoff.pptx", "rep": 0, "status": "ok", "convert_s": 2.635, "pdf_pages": 1, "render_s": 0.04, "ttfp_s": 2.675, "load_s": 1.612, "export_s": 0.927, "close_s": 0.095, "ts": 1792227697.243}
+{"mode": "warm-p1", "file": "Willowmere Kickoff.pptx", "rep": 1, "status": "ok", "convert_s": 2.703, "pdf_pages": 1, "render_s": 0.042, "ttfp_s": 2.745, "load_s": 1.665, "export_s": 0.946, "close_s": 0.092, "ts": 1792227699.989}

@@ -1,0 +1,49 @@
+#!/bin/sh
+# Installs and loads Sovander's AppArmor profile, then byte-compiles the app.
+# AppArmor problems never fail the install: without the profile Sovander still runs and tells the
+# user that offline protection is off.
+set -e
+
+PROFILE=/etc/apparmor.d/sovander
+VARIANTS=/usr/share/sovander/apparmor
+
+# AppArmor 4 (Ubuntu 24.04) compiles the variant that lets WebKit's sandbox create its user
+# namespace under Ubuntu's userns restriction; AppArmor 3 (22.04) rejects that rule and needs none.
+pick_profile() {
+    if command -v apparmor_parser >/dev/null 2>&1 &&
+        apparmor_parser -Q -K -T "$VARIANTS/sovander.abi4" >/dev/null 2>&1; then
+        echo "$VARIANTS/sovander.abi4"
+    else
+        echo "$VARIANTS/sovander"
+    fi
+}
+
+load_profile() {
+    # Not in a container without AppArmor, not when the kernel has it switched off, not when the
+    # administrator disabled this profile
+    command -v apparmor_parser >/dev/null 2>&1 || return 0
+    [ ! -e /etc/apparmor.d/disable/sovander ] || return 0
+    if command -v aa-enabled >/dev/null 2>&1; then
+        aa-enabled --quiet 2>/dev/null || return 0
+    elif [ "$(cat /sys/module/apparmor/parameters/enabled 2>/dev/null)" != "Y" ]; then
+        return 0
+    fi
+    apparmor_parser -r -T -W "$PROFILE" ||
+        echo "sovander: could not load the AppArmor profile; Sovander will run without offline protection" >&2
+}
+
+case "$1" in
+configure)
+    install -m 0644 "$(pick_profile)" "$PROFILE"
+    load_profile
+    # The package directory is root's, so without this Python would recompile on every start
+    py3compile -q /usr/lib/sovander/sovander
+    ;;
+abort-upgrade | abort-remove | abort-deconfigure) ;;
+*)
+    echo "postinst called with unknown argument '$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

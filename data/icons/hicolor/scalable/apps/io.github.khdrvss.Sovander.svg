@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sovander app icon: the page is the owl (ear tufts, facial disc, eyes, beak; lines of text below). Saidxon Xaydarov, AGPL-3.0-or-later. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <!-- the page's silhouette: its top corners rise as an owl's ear tufts -->
+    <path id="page" d="M20 30 L24 10 L46 22 Q64 17 82 22 L104 10 L108 30 V104 Q108 116 96 116 H32 Q20 116 20 104 Z"/>
+    <clipPath id="inside"><use href="#page"/></clipPath>
+    <clipPath id="paper"><path d="M10 68 Q64 92 118 68 V124 H10 Z"/></clipPath>
+  </defs>
+  <use href="#page" fill="#3584e4"/>
+  <g clip-path="url(#inside)">
+    <!-- the facial disc around the eyes, what tells an owl from a cat -->
+    <circle cx="45" cy="47" r="23" fill="#62a0ea"/>
+    <circle cx="83" cy="47" r="23" fill="#62a0ea"/>
+    <path d="M10 68 Q64 92 118 68 V124 H10 Z" fill="#f6f5f4"/>
+    <rect x="10" y="110" width="108" height="10" fill="#deddda"/>
+    <path d="M10 68 Q64 92 118 68" fill="none" stroke="#1c71d8" stroke-width="4"/>
+  </g>
+  <!-- a thin edge on the paper only, so a white page still has a shape on a white background -->
+  <g clip-path="url(#paper)">
+    <use href="#page" fill="none" stroke="#c0bfbc" stroke-width="3" clip-path="url(#inside)"/>
+  </g>
+  <circle cx="45" cy="47" r="15" fill="#f6d32d" stroke="#e5a50a" stroke-width="3"/>
+  <circle cx="83" cy="47" r="15" fill="#f6d32d" stroke="#e5a50a" stroke-width="3"/>
+  <circle cx="45" cy="47" r="7" fill="#241f31"/>
+  <circle cx="83" cy="47" r="7" fill="#241f31"/>
+  <circle cx="48" cy="44" r="2.5" fill="#ffffff"/>
+  <circle cx="86" cy="44" r="2.5" fill="#ffffff"/>
+  <path d="M58 61 H70 L64 72 Z" fill="#e66100"/>
+  <path d="M38 92 H90 M38 102 H76" stroke="#c0bfbc" stroke-width="5" stroke-linecap="round"/>
+</svg>

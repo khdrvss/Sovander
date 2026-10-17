@@ -1,0 +1,103 @@
+# Release (public-release spec D5; Requirement 5): a tag v<version> → tests → the .deb and one offline
+# bundle per Ubuntu release → a GitHub release with SHA256SUMS and the CHANGELOG section as notes.
+#
+#   git tag v0.1.0 && git push origin v0.1.0
+#
+# The .deb is Architecture: all, so one build serves 22.04 and 24.04; the offline bundles are made on each
+# release itself, because they carry that release's packages. Only the last job may write (the release).
+# Actions are pinned by commit SHA, as in ci.yml.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTEST_ADDOPTS: "-p no:cacheprovider"
+  TEST_PACKAGES: >-
+    python3-pytest python3-gi gir1.2-glib-2.0 python3-fitz python3-cryptography python3-charset-normalizer
+    xvfb libgl1-mesa-dri gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0
+    heif-gdk-pixbuf libavif-gdk-pixbuf fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
+    python3-uno libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui libreoffice-draw-nogui
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Ubuntu's packages
+        run: |
+          sudo apt-get update -qq
+          # shellcheck disable=SC2086 # the package list is word-split on purpose
+          sudo apt-get install -y -qq --no-install-recommends $TEST_PACKAGES
+      - name: Unit, packaging and view tests
+        run: xvfb-run -a python3 -m pytest -m "not engine"
+      - name: Engine tests
+        run: xvfb-run -a python3 -m pytest -m engine
+
+  build:
+    needs: tests
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: The tag names the package's version
+        run: |
+          version=$(dpkg-parsechangelog -l packaging/debian/changelog -S Version)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME, but packaging/debian/changelog says $version"; exit 1
+          fi
+      - name: Build the .deb and the offline bundle for this release
+        run: |
+          sudo apt-get update -qq
+          deb=$(packaging/build-deb.sh)
+          packaging/make-offline-bundle.sh "$deb"
+          ls -l dist
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist-${{ matrix.os }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write  # to create the release; nothing else
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: artifacts
+      - name: Files and checksums
+        run: |
+          mkdir release
+          cp artifacts/dist-ubuntu-24.04/*.deb release/         # one .deb serves both releases
+          cp artifacts/dist-ubuntu-*/sovander-offline-*.tar release/
+          (cd release && sha256sum -- * >SHA256SUMS && cat SHA256SUMS)
+      - name: Notes from CHANGELOG.md
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          awk -v v="$version" '$0 ~ "^## " v "( |$)" {on=1; next} /^## / {on=0} on' CHANGELOG.md >notes.md
+          test -s notes.md || { echo "CHANGELOG.md has no section for $version"; exit 1; }
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release/* --title "Sovander ${GITHUB_REF_NAME#v}" --notes-file notes.md

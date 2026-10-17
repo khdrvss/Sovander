@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Gander's epub.html (MIT, see LICENSES.md). The Content-Security-Policy arrives as a response
+     header on every file of this page: see CSP in sovander/views/web_view.py. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-vw-word="Book">Book</title>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="epub.css">
+<script src="lib/jszip3.min.js"></script>
+<script src="lib/purify.min.js"></script>
+</head>
+<body>
+<div id="vw-status" class="vw-status vw-wait" data-vw-word="Opening book…">Opening book…</div>
+
+<div id="epub-bar" class="epub-bar" hidden>
+  <button type="button" id="epub-contents-open" data-vw-word="Contents">Contents</button>
+  <span id="epub-where" class="epub-where"></span>
+</div>
+
+<!-- The chapter being read, drawn inside this element's shadow tree: see epub.js. The
+     frame keeps it under what opens over it: see epub.css -->
+<div class="epub-frame"><main id="book"></main></div>
+
+<div id="epub-turn" class="epub-turn" hidden>
+  <button type="button" id="epub-prev" data-vw-word="Previous">Previous</button>
+  <button type="button" id="epub-next" data-vw-word="Next">Next</button>
+</div>
+
+<div id="epub-contents" class="epub-contents" role="dialog" aria-modal="true"
+     aria-labelledby="epub-contents-title" hidden>
+  <div class="epub-contents-head">
+    <h1 id="epub-contents-title" data-vw-word="Contents">Contents</h1>
+    <button type="button" id="epub-contents-close" data-vw-word="Close">Close</button>
+  </div>
+  <p id="epub-title" class="epub-title"></p>
+  <ol id="epub-contents-list" class="epub-contents-list"></ol>
+</div>
+
+<script src="app.js"></script>
+<script src="find.js"></script>
+<script src="epub.js"></script>
+</body>
+</html>

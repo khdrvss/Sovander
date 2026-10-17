@@ -1,0 +1,21 @@
+[Desktop Entry]
+Type=Application
+Name=Sovander
+Name[ru]=Sovander
+GenericName=Document Viewer
+GenericName[ru]=Просмотр документов
+Comment=Read Office files, PDFs, books and images offline
+Comment[ru]=Просмотр файлов Office, PDF, книг и изображений без интернета
+Keywords=document;viewer;pdf;word;excel;powerpoint;office;docx;xlsx;pptx;odt;epub;offline;
+Keywords[ru]=документ;просмотр;просмотрщик;pdf;word;excel;powerpoint;офис;книга;офлайн;
+Exec=sovander %U
+TryExec=sovander
+Icon=io.github.khdrvss.Sovander
+Terminal=false
+StartupNotify=true
+# The window's app ID, as the file name: lets every shell (X11 too) match windows to this entry
+StartupWMClass=io.github.khdrvss.Sovander
+Categories=Office;Viewer;
+# Listing types only adds Sovander to "Open With"; it never changes the user's defaults (Requirement 1.5).
+# Aliases sit beside canonical names where Ubuntu 22.04 and 24.04 disagree (yaml, javascript).
+MimeType=application/pdf;application/x-pdf;application/vnd.openxmlformats-officedocument.wordprocessingml.document;application/vnd.ms-word.document.macroEnabled.12;application/vnd.openxmlformats-officedocument.wordprocessingml.template;application/vnd.ms-word.template.macroEnabled.12;application/msword;application/msword-template;application/vnd.oasis.opendocument.text;application/vnd.oasis.opendocument.text-template;application/rtf;text/rtf;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;application/vnd.ms-excel.sheet.macroEnabled.12;application/vnd.ms-excel.sheet.binary.macroEnabled.12;application/vnd.openxmlformats-officedocument.spreadsheetml.template;application/vnd.ms-excel;application/vnd.oasis.opendocument.spreadsheet;text/csv;text/tab-separated-values;application/vnd.openxmlformats-officedocument.presentationml.presentation;application/vnd.openxmlformats-officedocument.presentationml.slideshow;application/vnd.ms-powerpoint.presentation.macroEnabled.12;application/vnd.openxmlformats-officedocument.presentationml.template;application/vnd.oasis.opendocument.presentation;application/vnd.ms-powerpoint;application/vnd.oasis.opendocument.graphics;application/epub+zip;text/markdown;text/x-markdown;text/plain;text/x-log;application/json;application/xml;text/xml;application/yaml;application/x-yaml;application/toml;text/x-csrc;text/x-chdr;text/x-c++src;text/x-c++hdr;text/x-python;text/x-python3;text/x-java;text/x-kotlin;text/javascript;application/javascript;text/rust;text/x-go;application/x-ruby;application/x-php;application/sql;application/vnd.dart;application/x-shellscript;text/css;text/html;text/x-tex;text/x-makefile;text/x-patch;text/x-gradle;text/x-verilog;text/x-vhdl;text/x-nfo;application/x-subrip;text/vtt;image/jpeg;image/png;image/webp;image/gif;image/bmp;image/svg+xml;image/tiff;image/heif;image/heic;image/avif;application/zip;application/x-zip-compressed;
