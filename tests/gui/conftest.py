@@ -83,6 +83,10 @@ def pixels():
     """The widget as it would be drawn now, as an RGBA fitz.Pixmap."""
 
     def capture(widget):
+        if gi.version_info < (3, 44):
+            # PyGObject 3.42 (Ubuntu 22.04) cannot hand a GskRenderNode back to GTK ("expected GObject but
+            # got Gsk.ColorNode") and then crashes freeing it; skip before making one. The app never does.
+            pytest.skip("pixel checks need PyGObject 3.44 or newer (Ubuntu 24.04)")
         w, h = widget.get_width(), widget.get_height()
         snapshot = Gtk.Snapshot()
         widget.do_snapshot(snapshot)

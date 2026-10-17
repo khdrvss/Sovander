@@ -19,6 +19,7 @@ from dataclasses import dataclass, replace
 
 import gi
 
+from sovander import pdf_names
 from sovander.i18n import _
 from sovander.views import weak_handler
 from sovander.views.selection import keep_with
@@ -206,7 +207,10 @@ def _resolver(doc, lock):
         page = found[0] if found else -1
         if isinstance(page, tuple):  # (chapter, page) in some versions
             page = page[-1]
-        return page if isinstance(page, int) else -1
+        if not isinstance(page, int) or page < 0:  # PyMuPDF 1.19 resolves no names: read the file's own
+            with lock:
+                page = pdf_names.page_of(doc, fragment.removeprefix("nameddest="))
+        return page
 
     return resolve
 

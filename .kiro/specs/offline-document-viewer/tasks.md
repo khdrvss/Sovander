@@ -200,6 +200,11 @@ Wave A: 1.1. Wave B: 1.2–1.4, 2.x, 3.x. Wave C: 4.x. Wave D: 5.x. Wave E: 6.x.
   - _Requirements: 9.1, 3.x (EPUB, Markdown), 12.x printing_
   - Факт: bwrap child: `/newroot/ rw, /newroot/** rwkl,` (exists only in bwrap's mount namespace); main: `/run/cups/cups.sock rw,`; both variants parse (apparmor_parser -Q -K -T); tests/offline test_web_view_sandbox_starts_inside_the_profile fails on the old profile ("Can't mkdir /usr") and runs in the CI offline job
 
+- [x] C16 The first CI run on GitHub (and clean ubuntu:22.04/24.04 containers, run locally with docker) found what this machine hid
+  - the unit job could not even import the tests without GTK (tests/gui/conftest.py, two engine tests); the engine job had no GTK, so the open-pipeline and sheet-view engine tests had never run anywhere; unconfined WebKit aborted (SIGTRAP) on 24.04 runners, where only profiled programs may create user namespaces (this machine has Lutris's bwrap profile); a fresh Ubuntu has no WebP or SVG image loader; PyMuPDF 1.19 (22.04) resolves no named destination; GtkSourceView 5.12.0 (24.04) never frees a view showing line numbers (fixed upstream in 5.12.1), so every closed text file stayed in memory; 22.04's PyGObject 3.42 cannot pass render nodes and segfaults freeing them
+  - _Requirements: 13.1, 3.x (images, links, text), NFR memory_
+  - Факт: tests/conftest.py leaves out what needs GTK when it is missing; CI unit +gir1.2-gtk-4.0/librsvg2-common, engine +GUI packages under Xvfb, userns allowed for unconfined tests on 24.04 runners (gui, engine, release); Depends +librsvg2-common +webp-pixbuf-loader; sovander/pdf_names.py reads the name tree itself (bounded, loop-safe; 4 tests); line numbers only with GtkSourceView ≥ 5.12.1; pixel checks skip on PyGObject < 3.44. Ubuntu 22.04 declared "in progress": its CI jobs no longer block, README/CHANGELOG say 24.04, releases bundle 24.04 only. Local fast suite 1032 passed
+
 ## Progress
 
 | Wave | Tasks | Status |
@@ -209,6 +214,6 @@ Wave A: 1.1. Wave B: 1.2–1.4, 2.x, 3.x. Wave C: 4.x. Wave D: 5.x. Wave E: 6.x.
 | C | 4.1–4.8 | done; 4.8 large .xlsx first screen 0.13–0.22 s (was 4–25 s or a watchdog error), follow-ups in C7 |
 | D | 5.1–5.4 | done; app launches and renders docx/xlsx/pptx/PDF (screenshots, 2026-10-17) |
 | E | 6.1–6.4 | done (CI never run on GitHub; AppArmor never loaded); cold start on Ubuntu's .deb engine 1.48–1.77 s (5 s target) |
-| Cascade | C1–C15 | done; C8–C12 found in the final verification (retrospective, requirements 4.7, 4.8, 10.6, 10.7) |
+| Cascade | C1–C16 | done; C8–C12 found in the final verification (retrospective, requirements 4.7, 4.8, 10.6, 10.7) |
 
 Test suite (2026-10-17, final verification): ruff clean; unit + gui 1023 passed, 2 skipped; engine + fidelity + fuzz + perf 75 passed, 1 skipped (the AppArmor gate needs the installed .deb), then after C12 the open-pipeline, sheet and guard engine tests again (33 passed); six real launches (docx, xlsx, csv, ods, pptx, epub; Russian UI) exit 0 with no engine left, and none left after the display is lost; .deb builds (0.1.0, 882 KB).

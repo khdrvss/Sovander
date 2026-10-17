@@ -56,7 +56,8 @@ audio and video, 3D models (shown as text where they are text).
 
 ## Install
 
-Sovander runs on **Ubuntu 22.04 and 24.04** (x86-64).
+Sovander runs on **Ubuntu 24.04** (x86-64). Ubuntu 22.04 support is in progress: its older GTK and
+PyMuPDF still fail some of the view tests.
 
 **From a release.** Download `sovander_<version>_all.deb` from
 [Releases](https://github.com/khdrvss/Sovander/releases) and install it with its dependencies:

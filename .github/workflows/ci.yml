@@ -31,10 +31,11 @@ env:
   PYTHONDONTWRITEBYTECODE: "1"
   PYTEST_ADDOPTS: "-p no:cacheprovider"
   UNIT_PACKAGES: >-
-    python3-pytest python3-gi gir1.2-glib-2.0 python3-fitz python3-cryptography python3-charset-normalizer
+    python3-pytest python3-gi gir1.2-glib-2.0 gir1.2-gtk-4.0 python3-fitz python3-cryptography
+    python3-charset-normalizer librsvg2-common
   GUI_PACKAGES: >-
     xvfb libgl1-mesa-dri gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0
-    heif-gdk-pixbuf libavif-gdk-pixbuf fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
+    heif-gdk-pixbuf libavif-gdk-pixbuf webp-pixbuf-loader fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
   ENGINE_PACKAGES: >-
     python3-uno libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui
     libreoffice-draw-nogui fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
@@ -105,6 +106,8 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
+    # Ubuntu 22.04 (GTK 4.6, PyGObject 3.42, PyMuPDF 1.19) is not supported yet: visible, not blocking
+    continue-on-error: ${{ matrix.os == 'ubuntu-22.04' }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -123,6 +126,14 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
             -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+      # Unconfined test runs: Ubuntu 24.04 lets only profiled programs create user namespaces, and WebKit's
+      # bwrap sandbox then aborts the process (SIGTRAP). The installed app has its own profile for that
+      # (the offline job); a throwaway runner may lift the restriction for the unconfined tests.
+      - name: Let WebKit's sandbox start in unconfined tests
+        run: |
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
       - name: View tests under Xvfb
         run: xvfb-run -a python3 -m pytest -m gui -rs
 
@@ -132,6 +143,8 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
+    # Ubuntu 22.04 (GTK 4.6, PyGObject 3.42, PyMuPDF 1.19) is not supported yet: visible, not blocking
+    continue-on-error: ${{ matrix.os == 'ubuntu-22.04' }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -145,7 +158,7 @@ jobs:
           restore-keys: apt-${{ matrix.os }}-engine-
       - name: Install Ubuntu's packages
         run: |
-          read -ra packages <<<"$UNIT_PACKAGES $ENGINE_PACKAGES"
+          read -ra packages <<<"$UNIT_PACKAGES $GUI_PACKAGES $ENGINE_PACKAGES"
           mkdir -p ~/apt-archives/partial
           sudo apt-get update -qq
           sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
@@ -155,8 +168,17 @@ jobs:
         run: |
           soffice --version
           python3 -c 'import uno; print("pyuno", uno.__file__)'
+      # Unconfined test runs: Ubuntu 24.04 lets only profiled programs create user namespaces, and WebKit's
+      # bwrap sandbox then aborts the process (SIGTRAP). The installed app has its own profile for that
+      # (the offline job); a throwaway runner may lift the restriction for the unconfined tests.
+      - name: Let WebKit's sandbox start in unconfined tests
+        run: |
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+      # under Xvfb: the open pipeline and sheet view tests build real views
       - name: Engine tests (production pipe connection)
-        run: python3 -m pytest -m engine -rs tests/engine
+        run: xvfb-run -a python3 -m pytest -m engine -rs tests/engine
       # Separate run: one LibreOffice at a time (tests/engine keeps its own until the session ends)
       - name: Engine fuzz smoke and first-page timings
         env:

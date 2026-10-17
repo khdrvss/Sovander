@@ -29,18 +29,19 @@
   - _Requirements: 6.1, 6.2, 6.3_
   - Факт: homepage, bugtracker, vcs-browser, contribute, 5 screenshots with en/ru captions, release 0.1.0; `appstreamcli validate`: successful (one pedantic note: the ID's capital, GNOME convention); About shows the page (D8)
 
-- [ ] 4. Publish
+- [x] 4. Publish
 - [x] 4.1 Pre-publish scan (secrets, personal paths, generated/third-party files), .gitignore, full test run
   - _Requirements: 7.1, 7.2_
   - Факт: no secrets; personal paths in 2 spike scripts made relative; generated spike output, logs and the corpus's extracted words ignored; private notes removed from the specs; 292 files, 3.5 MB; ruff clean, 1025 + 75 tests green, .deb builds
-- [ ] 4.2 First commit on main; with the owner's OK: public repository khdrvss/Sovander, push, topics
+- [x] 4.2 First commit on main; with the owner's OK: public repository khdrvss/Sovander, push, topics
   - _Requirements: 7.1, 5.1_
+  - Факт: commit ce6fcd8 (297 files, author Saidxon Xaydarov, the owner's choice of address); public https://github.com/khdrvss/Sovander, 14 topics, private vulnerability reporting on; before it the .deb was installed (pkexec) and its first confined runs found C15 (books crashed, no printers) — fixed from a full strace of bwrap, 6/6 offline tests, final screenshots from the installed app
 
 ## Progress
 
 | Wave | Tasks | Status |
 |---|---|---|
 | 1 | 1.1, 1.2 | done |
-| 2 | 2.1–2.3 | done; final screenshots wait for the installed .deb |
+| 2 | 2.1–2.3 | done; screenshots from the installed, confined app |
 | 3 | 3.1, 3.2 | done |
-| 4 | 4.1, 4.2 | 4.1 done; 4.2 waits for the owner's OK |
+| 4 | 4.1, 4.2 | done; first CI run and the v0.1.0 tag follow |

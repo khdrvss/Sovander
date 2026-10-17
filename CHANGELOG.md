@@ -4,7 +4,7 @@ All notable changes to Sovander. Versions follow [Semantic Versioning](https://s
 
 ## 0.1.0 — first public release
 
-The first release: a view-only, offline document viewer for Ubuntu 22.04 and 24.04.
+The first release: a view-only, offline document viewer for Ubuntu 24.04 (22.04 support is in progress).
 
 - **Opens** Word (DOCX, DOCM, DOTX, DOC), RTF, OpenDocument (ODT, ODS, ODP, ODG), Excel (XLSX, XLSM, XLSB,
   XLTX, XLS), CSV and TSV, PowerPoint (PPTX, PPSX, PPTM, POTX, PPT), PDF, EPUB, Markdown, text and source

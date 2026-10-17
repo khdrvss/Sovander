@@ -24,7 +24,9 @@ Depends: python3 (>= 3.10),
  fonts-liberation2,
  apparmor,
  heif-gdk-pixbuf,
- libavif-gdk-pixbuf
+ libavif-gdk-pixbuf,
+ librsvg2-common,
+ webp-pixbuf-loader
 Description: offline, read-only document viewer
  Sovander opens the files people receive every day: Word, Excel, PowerPoint,
  OpenDocument, PDF, EPUB books, Markdown, text, images and zip archives. It

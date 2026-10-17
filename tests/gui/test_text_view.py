@@ -153,7 +153,8 @@ def test_read_only_monospace():
     view = TextView()
     assert not view.view.get_editable()
     assert view.view.get_monospace()
-    assert view.has_line_numbers == (text_view.GtkSource is not None)
+    # line numbers where GtkSourceView no longer leaks a view that shows them (5.12.1+)
+    assert view.has_line_numbers == (text_view.GtkSource is not None and text_view._line_numbers_are_safe())
 
 
 def test_note_is_shown_and_follows_the_language():

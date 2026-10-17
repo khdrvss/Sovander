@@ -13,6 +13,24 @@ CORPUS = Path(__file__).parent.parent / "spike" / "corpus"
 ENGINE_HOME = Path(__file__).resolve().parents[1] / "build" / "test-engine"
 
 
+def _views_available() -> bool:
+    """GTK 4 and libadwaita: absent where only the unit tests run (CI's unit job installs neither)."""
+    try:
+        import gi
+
+        gi.require_version("Gtk", "4.0")
+        gi.require_version("Adw", "1")
+        return True
+    except (ImportError, ValueError):
+        return False
+
+
+# Without GTK these cannot even be imported, and one import error fails the whole session
+collect_ignore = [] if _views_available() else [
+    "gui", "engine/test_open_pipeline.py", "engine/test_sheet_view_engine.py",
+]
+
+
 @pytest.fixture(scope="session", autouse=True)
 def collect_on_main_thread():
     """As the app does: the cycle collector never runs in a worker thread, where it would finalise

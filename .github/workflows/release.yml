@@ -3,8 +3,8 @@
 #
 #   git tag v0.1.0 && git push origin v0.1.0
 #
-# The .deb is Architecture: all, so one build serves 22.04 and 24.04; the offline bundles are made on each
-# release itself, because they carry that release's packages. Only the last job may write (the release).
+# The .deb is Architecture: all; the offline bundle is made on the Ubuntu release it is for, because it
+# carries that release's packages (24.04 for now). Only the last job may write (the release).
 # Actions are pinned by commit SHA, as in ci.yml.
 name: release
 
@@ -37,6 +37,9 @@ jobs:
           sudo apt-get update -qq
           # shellcheck disable=SC2086 # the package list is word-split on purpose
           sudo apt-get install -y -qq --no-install-recommends $TEST_PACKAGES
+      # as in ci.yml: Ubuntu 24.04 lets only profiled programs create user namespaces (WebKit's sandbox)
+      - name: Let WebKit's sandbox start in unconfined tests
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Unit, packaging and view tests
         run: xvfb-run -a python3 -m pytest -m "not engine"
       - name: Engine tests
@@ -47,7 +50,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04]
+        os: [ubuntu-24.04]  # 22.04 joins when it is supported (its views fail on GTK 4.6 / PyGObject 3.42)
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
@@ -89,7 +92,7 @@ jobs:
       - name: Files and checksums
         run: |
           mkdir release
-          cp artifacts/dist-ubuntu-24.04/*.deb release/         # one .deb serves both releases
+          cp artifacts/dist-ubuntu-24.04/*.deb release/
           cp artifacts/dist-ubuntu-*/sovander-offline-*.tar release/
           (cd release && sha256sum -- * >SHA256SUMS && cat SHA256SUMS)
       - name: Notes from CHANGELOG.md

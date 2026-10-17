@@ -94,6 +94,8 @@ DEPENDS = [
     "apparmor",
     "heif-gdk-pixbuf",
     "libavif-gdk-pixbuf",
+    "librsvg2-common",  # the SVG image loader: absent on a minimal system
+    "webp-pixbuf-loader",  # the WebP image loader: absent even on a fresh Ubuntu 24.04
 ]
 
 needs_dpkg_deb = pytest.mark.skipif(shutil.which("dpkg-deb") is None, reason="dpkg-deb not installed")
