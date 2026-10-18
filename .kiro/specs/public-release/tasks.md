@@ -44,4 +44,4 @@
 | 1 | 1.1, 1.2 | done |
 | 2 | 2.1–2.3 | done; screenshots from the installed, confined app |
 | 3 | 3.1, 3.2 | done |
-| 4 | 4.1, 4.2 | done; first CI run and the v0.1.0 tag follow |
+| 4 | 4.1, 4.2 | done; CI green on 24.04 (adcf7f9), v0.1.0 released 2026-10-18: .deb, offline bundle, SHA256SUMS (release run 39121625715) |
