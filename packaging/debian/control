@@ -15,7 +15,7 @@ Depends: python3 (>= 3.10),
  python3-fitz,
  python3-uno,
  libreoffice-writer-nogui | libreoffice-writer,
- libreoffice-uiconfig-writer | libreoffice-common (<< 4:7.6~),
+ libreoffice-uiconfig-writer | libreoffice-writer (<< 4:7.6~),
  libreoffice-calc-nogui | libreoffice-calc,
  libreoffice-impress-nogui | libreoffice-impress,
  libreoffice-draw-nogui | libreoffice-draw,
@@ -30,6 +30,7 @@ Depends: python3 (>= 3.10),
  libavif-gdk-pixbuf,
  librsvg2-common,
  webp-pixbuf-loader
+Breaks: libreoffice-writer-nogui (<< 4:7.6~)
 Description: offline, read-only document viewer
  Sovander opens the files people receive every day: Word, Excel, PowerPoint,
  OpenDocument, PDF, EPUB books, Markdown, text, images and zip archives. It

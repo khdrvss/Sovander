@@ -99,7 +99,8 @@ live in `po/`; see [CONTRIBUTING.md](CONTRIBUTING.md) to add one.
 
 ## Build and test
 
-Sovander is Python 3 with GTK 4 and libadwaita. On Ubuntu:
+Sovander is Python 3 with GTK 4 and libadwaita. On Ubuntu 24.04 (on 22.04, `libreoffice-writer` instead of
+`libreoffice-writer-nogui libreoffice-uiconfig-writer`):
 
 ```sh
 sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0 \

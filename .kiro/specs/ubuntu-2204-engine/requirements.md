@@ -17,9 +17,9 @@ in LibreOffice 7.3 itself (reproduced in an ubuntu:22.04 container with CI's pac
   ResourceFactories`, F2/R0). From 7.6 the factory map is built in and the path is unknown, so 24.04's
   LibreOffice ignores the item.
 - Tests: the two repair tests skip before LibreOffice 24.2 (`repairs_ooxml`), with the reason shown.
-- Not fixed here: Writer's comment crash on 22.04 (`annotation.ui` ships only in the full Writer there,
-  see `.kiro/specs/writer-comment-crash/`), slides fidelity on 7.3 (87.7%: its PDF splits words), and the
-  22.04 GUI segfault (PyGObject 3.42).
+- Not fixed here: Writer's comment crash on 22.04 (`annotation.ui` ships only in the full Writer there;
+  fixed by depending on it, `.kiro/specs/writer-comment-crash/`, extension 2026-10-18), slides fidelity on
+  7.3 (87.7%: its PDF splits words), and the 22.04 GUI segfault (PyGObject 3.42).
 
 ## Acceptance
 

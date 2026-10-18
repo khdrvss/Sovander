@@ -7,7 +7,7 @@
 #   lint     ruff, shell syntax, actionlint
 #   unit     pytest -m "not engine and not gui": unit, packaging, router/archive fuzz, unconfined probe
 #   gui      the views under Xvfb
-#   engine   LibreOffice nogui + python3-uno from the archive, production pipe connection
+#   engine   LibreOffice nogui + python3-uno from the archive, production pipe connection; 22.04: full Writer
 #   package  build the .deb, install it with apt, load the profile, packaging tests, purge
 #   offline  the installed .deb inside its profile: VERIFIED, no inet, unix works (tests/offline/run-gate.sh)
 #
@@ -37,7 +37,7 @@ env:
     xvfb libgl1-mesa-dri gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0 python3-gi-cairo
     heif-gdk-pixbuf libavif-gdk-pixbuf webp-pixbuf-loader fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
   ENGINE_PACKAGES: >-
-    python3-uno libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui
+    python3-uno libreoffice-calc-nogui libreoffice-impress-nogui
     libreoffice-draw-nogui fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
 
 jobs:
@@ -149,10 +149,12 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
         include:
-          # Writer's UI files (a comment's window): 24.04's libreoffice-writer-nogui does not pull them;
-          # 22.04's LibreOffice 7.3 has no such package
+          # Writer with its UI files (a comment's window): 24.04's libreoffice-writer-nogui does not pull
+          # them; on 22.04 (LibreOffice 7.3) only the full Writer has them, as the .deb installs there
+          - os: ubuntu-22.04
+            extra_packages: libreoffice-writer
           - os: ubuntu-24.04
-            extra_packages: libreoffice-uiconfig-writer
+            extra_packages: libreoffice-writer-nogui libreoffice-uiconfig-writer
     runs-on: ${{ matrix.os }}
     # Ubuntu 22.04 (GTK 4.6, PyGObject 3.42, PyMuPDF 1.19) is not supported yet: visible, not blocking
     continue-on-error: ${{ matrix.os == 'ubuntu-22.04' }}

@@ -33,7 +33,7 @@ env:
   ENGINE_FUZZ_MINUTES: ${{ inputs.engine_fuzz_minutes || '300' }}
   BASE_PACKAGES: python3-pytest python3-fitz python3-cryptography python3-charset-normalizer
   ENGINE_PACKAGES: >-
-    python3-uno libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui
+    python3-uno libreoffice-calc-nogui libreoffice-impress-nogui
     libreoffice-draw-nogui fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
 
 jobs:
@@ -43,10 +43,12 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
         include:
-          # Writer's UI files (a comment's window): 24.04's libreoffice-writer-nogui does not pull them;
-          # 22.04's LibreOffice 7.3 has no such package
+          # Writer with its UI files (a comment's window): 24.04's libreoffice-writer-nogui does not pull
+          # them; on 22.04 (LibreOffice 7.3) only the full Writer has them, as the .deb installs there
+          - os: ubuntu-22.04
+            extra_packages: libreoffice-writer
           - os: ubuntu-24.04
-            extra_packages: libreoffice-uiconfig-writer
+            extra_packages: libreoffice-writer-nogui libreoffice-uiconfig-writer
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     steps:
@@ -125,8 +127,10 @@ jobs:
         os: [ubuntu-22.04, ubuntu-24.04]
         kind: [text, sheet, slides]
         include:
+          - os: ubuntu-22.04
+            extra_packages: libreoffice-writer  # as in fidelity
           - os: ubuntu-24.04
-            extra_packages: libreoffice-uiconfig-writer  # as in fidelity
+            extra_packages: libreoffice-writer-nogui libreoffice-uiconfig-writer
     runs-on: ${{ matrix.os }}
     timeout-minutes: 340
     steps:
@@ -170,8 +174,10 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
         include:
+          - os: ubuntu-22.04
+            extra_packages: libreoffice-writer  # as in fidelity
           - os: ubuntu-24.04
-            extra_packages: libreoffice-uiconfig-writer  # as in fidelity
+            extra_packages: libreoffice-writer-nogui libreoffice-uiconfig-writer
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:

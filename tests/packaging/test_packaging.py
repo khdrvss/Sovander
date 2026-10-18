@@ -87,8 +87,8 @@ DEPENDS = [
     "libreoffice-writer-nogui | libreoffice-writer",
     # Writer's UI files: without annotation.ui the engine aborts on any comment, and 24.04's -nogui Writer
     # does not pull them. LibreOffice before 7.6 (22.04) has no such package: there only the full Writer
-    # carries the files
-    "libreoffice-uiconfig-writer | libreoffice-common (<< 4:7.6~)",
+    # carries the files, so it replaces the -nogui one (they conflict)
+    "libreoffice-uiconfig-writer | libreoffice-writer (<< 4:7.6~)",
     "libreoffice-calc-nogui | libreoffice-calc",
     "libreoffice-impress-nogui | libreoffice-impress",
     "libreoffice-draw-nogui | libreoffice-draw",
@@ -349,6 +349,8 @@ def test_deb_control_fields(deb):
     assert deb_field(deb, "Architecture") == "all"
     depends = [d.strip() for d in deb_field(deb, "Depends").split(",")]
     assert depends == DEPENDS
+    # 22.04's -nogui Writer has no annotation.ui; apt replaces an installed one only for a Breaks
+    assert deb_field(deb, "Breaks") == "libreoffice-writer-nogui (<< 4:7.6~)"
     info = run("dpkg-deb", "-I", str(deb)).stdout
     for script in ("postinst", "prerm", "postrm"):
         assert re.search(rf"\s\*\s+{script}\s", info), script

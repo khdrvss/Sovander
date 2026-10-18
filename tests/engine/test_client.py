@@ -87,7 +87,8 @@ def test_content_wins_over_the_given_kind(engine, fixture_file):
 
 def test_a_comment_leaves_the_engine_running(engine):
     """Writer builds a comment's window from annotation.ui (libreoffice-uiconfig-writer, which 24.04's
-    libreoffice-writer-nogui does not pull); without the file soffice aborts."""
+    libreoffice-writer-nogui does not pull; on 22.04 only the full libreoffice-writer has it); without the
+    file soffice aborts."""
     doc = flat_odt('<text:p>Commented<office:annotation><text:p>A note</text:p></office:annotation></text:p>')
     assert "Commented" in first_page_text(list(convert(doc, TEXT, engine=engine))[-1])
 
