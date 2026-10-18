@@ -3,6 +3,7 @@
 Requirements 1.1-1.4, 1.6, 3.1, 3.2, 3.8, 3.9, 7.1, 7.2, 8.2, 9.7, 11.1, 11.2, 12.2-12.4.
 """
 
+import faulthandler
 import gc
 import itertools
 import signal
@@ -76,7 +77,16 @@ def open_file(app, fixture_file, wait):
     def run(name, settle=lambda page: page.state != "loading"):
         source = Source.from_path(fixture_file(name)) if "/" not in name else Source.from_path(name)
         (window,) = app.open_sources([source])
-        assert wait(lambda: settle(window.page), 15), window.page.state
+        if not wait(lambda: settle(window.page), 15):
+            # Where the open is stuck, in the captured stderr: every thread, and whether this thread can
+            # still run the main loop that delivers the open job's result
+            faulthandler.dump_traceback(all_threads=True)
+            context = GLib.MainContext.default()
+            acquired = context.acquire()
+            if acquired:
+                context.release()
+            pytest.fail(f"still {window.page.state}; main context acquirable: {acquired}, "
+                        f"pending: {context.pending()}")
         return window
 
     return run
