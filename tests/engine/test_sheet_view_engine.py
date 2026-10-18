@@ -61,6 +61,10 @@ def show(view, book, **kwargs):
 
 
 def pixel(widget, x, y):
+    if gi.version_info < (3, 44):
+        # As the GUI pixels fixture: PyGObject 3.42 (Ubuntu 22.04) cannot hand a GskRenderNode back to GTK
+        # and crashes freeing it in a later collection; skip before making one
+        pytest.skip("pixel checks need PyGObject 3.44 or newer (Ubuntu 24.04)")
     snapshot = Gtk.Snapshot()
     widget.do_snapshot(snapshot)
     bounds = Graphene.Rect().init(0, 0, widget.get_width(), widget.get_height())
