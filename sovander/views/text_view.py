@@ -230,12 +230,13 @@ class TextView(Gtk.Box):
 
 
 def _line_numbers_are_safe() -> bool:
-    """GtkSourceView before 5.12.1 (Ubuntu 24.04 has 5.12.0) keeps a view with line numbers alive for
-    good: its gutter renderers held the view strongly ("switch to a weak ref for the GtkSourceView
-    backpointer ... fixes a potential leak", 5.12.1). Every closed text file stayed in memory with its
-    whole buffer, so line numbers wait for the fixed library."""
+    """GtkSourceView before 5.21 keeps a view with line numbers alive for good. Before 5.12.1 (Ubuntu
+    24.04 has 5.12.0) its gutter renderers held the view strongly ("switch to a weak ref for the
+    GtkSourceView backpointer ... fixes a potential leak", 5.12.1); until 5.21 so did the lines the
+    gutter last drew ("break a circular reference when line numbers are enabled"). Every closed text
+    file stayed in memory with its whole buffer, so line numbers wait for the fixed library."""
     version = (GtkSource.get_major_version(), GtkSource.get_minor_version(), GtkSource.get_micro_version())
-    return version >= (5, 12, 1)
+    return version >= (5, 21, 0)
 
 def _make_view():
     if GtkSource is not None:

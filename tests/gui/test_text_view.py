@@ -153,7 +153,7 @@ def test_read_only_monospace():
     view = TextView()
     assert not view.view.get_editable()
     assert view.view.get_monospace()
-    # line numbers where GtkSourceView no longer leaks a view that shows them (5.12.1+)
+    # line numbers where GtkSourceView no longer leaks a view that shows them (5.21+)
     assert view.has_line_numbers == (text_view.GtkSource is not None and text_view._line_numbers_are_safe())
 
 
@@ -184,6 +184,11 @@ def test_closed_view_is_freed_with_its_text(fixture_file):
     window = Gtk.Window()
     view = TextView()
     view.load_path(fixture_file("plain.txt"))
+    # Watched from C: a Python weakref sees only the wrapper, which goes while C still holds the
+    # GtkSource.View and the buffer with the text (5.12.0 with line numbers)
+    freed = []
+    view.view.weak_ref(freed.append, "view")
+    view.buffer.weak_ref(freed.append, "buffer")
     window.set_child(view)
     window.present()
     context = GLib.MainContext.default()
@@ -199,4 +204,5 @@ def test_closed_view_is_freed_with_its_text(fixture_file):
         context.iteration(False)
     gc.collect()
     assert gone() is None
+    assert sorted(freed) == ["buffer", "view"]
     assert not [r for r in i18n._listeners if r() is not None]

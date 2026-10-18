@@ -95,10 +95,10 @@ Cost for users: python3-gi-cairo (8 kB, with python3-cairo), the plugin and libd
 
 ## Found along the way (outside this fix)
 
-- GtkSourceView 5.12.0 and line numbers (C16): with line numbers forced on, the text view tests,
-  the memory test among them, pass on this machine and in a fresh 24.04 container (23/23). The leak
-  C16 reports is not reproduced by the repo's own test; C16's evidence was a clean container run,
-  which also had no CUPS, so it may have been B3. Turning line numbers back on is a separate decision.
+- GtkSourceView 5.12.0 and line numbers (C16): the leak is real. A first check here passed with
+  line numbers forced on, but the repo's memory test watched only the outer TextView, which is always
+  freed; watched from C, 0 of 200 closed views were freed. Corrected in
+  `.kiro/specs/line-numbers-gate/` (gate at 5.21, test watching the view and buffer).
 - 41 test jobs named "Sovander" are queued on the development machine's disabled printer; one other
   job there is not from the tests. Cancelling them is the owner's call.
 
