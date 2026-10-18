@@ -52,6 +52,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        # a release added here needs its own download step in the release job
         os: [ubuntu-24.04]  # 22.04 joins when it is supported (its views fail on GTK 4.6 / PyGObject 3.42)
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -88,9 +89,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # By name, one step per release: a run with a single artifact is unpacked straight into path,
+      # not into path/<name>/ (actions/download-artifact#426), and the copies below read <name>/
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          path: artifacts
+          name: dist-ubuntu-24.04
+          path: artifacts/dist-ubuntu-24.04
       - name: Files and checksums
         run: |
           mkdir release
@@ -100,7 +104,9 @@ jobs:
       - name: Notes from CHANGELOG.md
         run: |
           version=${GITHUB_REF_NAME#v}
-          awk -v v="$version" '$0 ~ "^## " v "( |$)" {on=1; next} /^## / {on=0} on' CHANGELOG.md >notes.md
+          # GitHub shows every newline of release notes as a line break: wrapped list items are rejoined
+          awk -v v="$version" '$0 ~ "^## " v "( |$)" {on=1; next} /^## / {on=0} on' CHANGELOG.md |
+            sed -z 's/\n  \+\([^ *+-]\)/ \1/g' >notes.md
           test -s notes.md || { echo "CHANGELOG.md has no section for $version"; exit 1; }
       - name: Publish
         env:

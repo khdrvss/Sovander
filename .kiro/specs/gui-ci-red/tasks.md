@@ -33,7 +33,9 @@
     without gi-cairo 2 print tests still fail; fresh ubuntu:24.04 container, release.yml's packages
     without LibreOffice, `--no-install-recommends`, no CUPS: 321 passed, 12 skipped (the skips CI shows);
     ruff and actionlint 1.7.12 clean. First attempt (cups-daemon in CI + a cleanup fixture) dropped, see
-    design.md "Rejected". Push and CI: waiting for the owner's OK
+    design.md "Rejected". Pushed as 28d2e71 (history rewritten without co-author lines, owner's OK);
+    CI run 39112432656: success, gui (ubuntu-24.04) green; 22.04 jobs red as before (non-blocking:
+    engine crashes, GUI segfault in test_home.py)
 
 ## Progress
 
@@ -41,4 +43,4 @@
 |---|---|
 | 1 | done |
 | 2 | done |
-| 3 | done locally; push and CI pending the owner's OK |
+| 3 | done; CI green |
