@@ -97,6 +97,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends -o APT::Keep-Downloaded-Packages=true \
             -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+          sudo chown -R "$(id -u):$(id -g)" ~/apt-archives  # apt leaves lock and partial/ root-only: the cache save failed on them
       - name: Tests without engine or display
         run: python3 -m pytest -m "not engine and not gui" -rs
 
@@ -132,6 +133,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
             -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+          sudo chown -R "$(id -u):$(id -g)" ~/apt-archives  # apt leaves lock and partial/ root-only: the cache save failed on them
       # Unconfined test runs: Ubuntu 24.04 lets only profiled programs create user namespaces, and WebKit's
       # bwrap sandbox then aborts the process (SIGTRAP). The installed app has its own profile for that
       # (the offline job); a throwaway runner may lift the restriction for the unconfined tests.
@@ -178,6 +180,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
             -o Dir::Cache::Archives="$HOME/apt-archives" "${packages[@]}"
+          sudo chown -R "$(id -u):$(id -g)" ~/apt-archives  # apt leaves lock and partial/ root-only: the cache save failed on them
       # tests/engine skips when the engine is missing; fail here instead of passing on skips
       - name: The engine is there
         run: |
@@ -237,6 +240,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \
             -o Dir::Cache::Archives="$HOME/apt-archives" "$DEB" python3-pytest
+          sudo chown -R "$(id -u):$(id -g)" ~/apt-archives  # apt leaves lock and partial/ root-only: the cache save failed on them
       - name: Load the AppArmor profile
         run: |
           sudo apparmor_parser -r -T -W /etc/apparmor.d/sovander
