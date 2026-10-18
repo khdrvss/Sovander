@@ -147,6 +147,15 @@ def test_not_a_spreadsheet(engine, fixture_file):
         workbook(fixture_file("report.docx"), engine=engine)
 
 
+def test_an_export_too_large_to_parse_is_refused(engine, fixture_file, monkeypatch):
+    """One far-off cell makes a 6 KB .xls export 0.5-1.6 GB of HTML (nightly fuzz on 22.04): refused, not
+    parsed for minutes."""
+    assert workbook(fixture_file("budget.xls"), engine=engine).sheets
+    monkeypatch.setattr("sovander.engine.sheets.MAX_HTML", 1000)
+    with pytest.raises(ConversionError):
+        workbook(fixture_file("budget.xls"), engine=engine)
+
+
 @pytest.mark.parametrize("name", SPIKE_COLOURED)
 def test_spike_cell_colours_survive(engine, corpus_file, name):
     book = workbook(corpus_file(name), engine=engine)

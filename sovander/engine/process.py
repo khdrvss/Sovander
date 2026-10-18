@@ -17,6 +17,7 @@ import subprocess
 import tempfile
 import threading
 import time
+import traceback
 import weakref
 from collections.abc import Callable
 from pathlib import Path
@@ -255,6 +256,10 @@ class Engine:
                 raise EngineTimeout("The document took too long to prepare and was stopped.")
             if "error" in box:
                 exc = box["error"]
+                # The job's frames hold its UNO proxies. Once the engine is gone, repr() of one aborts
+                # the whole process (pyuno lets the bridge's DisposedException escape), and a traceback
+                # shown with its arguments does that: the job is over, so its locals go
+                traceback.clear_frames(exc.__traceback__)
                 if not self._bridge_ok(exc):
                     log.warning("engine died during a job: %s", exc)
                     self._cleanup()

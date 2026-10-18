@@ -87,6 +87,24 @@ def test_job_errors_pass_through_without_restart(engine):
     assert engine.alive and engine.generation == generation
 
 
+def test_a_failed_job_leaves_no_proxies_behind(engine):
+    """repr() of a proxy whose engine died aborts the process: a test report showing a failed job's
+    arguments did that on 22.04 (exit 134). Only names are compared here, never the proxies."""
+
+    def crash(eng):
+        desktop = eng.desktop
+        os.killpg(eng.pid, signal.SIGKILL)
+        time.sleep(0.5)
+        desktop.getComponents().createEnumeration()
+
+    with pytest.raises(EngineCrashed) as crashed:
+        engine.run(crash)
+    tb = crashed.value.__cause__.__traceback__
+    while tb:
+        assert list(tb.tb_frame.f_locals) == [], tb.tb_frame.f_code.co_name
+        tb = tb.tb_next
+
+
 def test_production_connection_is_a_pipe(monkeypatch):
     monkeypatch.delenv("SOVANDER_ENGINE_CONNECT", raising=False)
     assert connection_string() == f"pipe,name=sovander-{os.getuid()}"

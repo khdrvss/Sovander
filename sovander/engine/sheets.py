@@ -29,6 +29,9 @@ _COLGROUP = re.compile(r'<colgroup\b(?:[^>]*?\bspan="?(\d+))?', re.IGNORECASE)
 _FORMULA_CELLS = 16  # css.sheet.CellFlags.FORMULA
 _CONTENT_CELLS = 1 | 2 | 4 | 16  # VALUE | DATETIME | STRING | FORMULA
 DEFAULT_WIDTH, DEFAULT_HEIGHT = 64, 17
+# The export writes every cell of a sheet's used area, empty or not (30-100 bytes each), and parsing
+# takes about 0.3 µs a byte: one far-off cell in a small file would cost minutes and gigabytes (NFR)
+MAX_HTML = 128 << 20
 
 
 @dataclass(slots=True)
@@ -162,8 +165,10 @@ def workbook(source: Path | bytes, password: str | None = None, engine: Engine |
         try:
             if not doc.supportsService("com.sun.star.sheet.SpreadsheetDocument"):
                 raise ConversionError("This file is not a spreadsheet.")
-            html = export(eng, doc, HTML_FILTER, filter_options="SkipImages").decode("utf-8", "replace")
-            return _sheet_infos(doc, _split_tables(html))
+            html = export(eng, doc, HTML_FILTER, filter_options="SkipImages")
+            if len(html) > MAX_HTML:
+                raise ConversionError("This spreadsheet is too large to show.")
+            return _sheet_infos(doc, _split_tables(html.decode("utf-8", "replace")))
         finally:
             close_document(doc)
 
