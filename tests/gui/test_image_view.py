@@ -141,6 +141,16 @@ def test_heic_opens_when_its_loader_is_installed(fixture_file):
             decode(data)
 
 
+def test_heic_finds_its_loader_by_brand(fixture_file):
+    """shared-mime-info 2.1 (Ubuntu 22.04) types HEIF by file name only; bytes reach the loader by brand."""
+    data = fixture_file("photo.heic").read_bytes()
+    name = image_view._loader_by_magic(data)
+    if "heif/avif" in FORMATS or "heif" in FORMATS:
+        assert image_view._decode(data, name).pixbuf.get_width() == 160
+    else:
+        assert name is None
+
+
 def test_missing_loader_names_the_format():
     assert str(UnsupportedImage("AVIF")) == "No decoder for AVIF images is installed"
     assert image_view._format_label(b"\0\0\0\x1cftypavif" + b"\0" * 20) == "AVIF"

@@ -235,6 +235,8 @@ def _line_numbers_are_safe() -> bool:
     GtkSourceView backpointer ... fixes a potential leak", 5.12.1); until 5.21 so did the lines the
     gutter last drew ("break a circular reference when line numbers are enabled"). Every closed text
     file stayed in memory with its whole buffer, so line numbers wait for the fixed library."""
+    if not hasattr(GtkSource, "get_major_version"):  # in the GIR since 5.7.1; Ubuntu 22.04 has 5.4
+        return False
     version = (GtkSource.get_major_version(), GtkSource.get_minor_version(), GtkSource.get_micro_version())
     return version >= (5, 21, 0)
 

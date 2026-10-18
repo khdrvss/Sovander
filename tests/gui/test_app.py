@@ -205,6 +205,8 @@ def test_drop_target_takes_files_into_the_empty_window_then_new_ones(app, fixtur
     app.activate()
     (home,) = app.get_windows()
     assert Gdk.FileList.__gtype__ in home.drop_target.get_gtypes()
+    if not hasattr(Gdk.FileList, "new_from_list"):
+        pytest.skip("Gdk.FileList.new_from_list needs GTK 4.8 or newer (Ubuntu 22.04 has 4.6)")
     files = [Gio.File.new_for_path(str(fixture_file(n))) for n in ("six-pages.pdf", "tiny.png")]
     assert home._on_drop(home.drop_target, Gdk.FileList.new_from_list(files), 10, 10)
     assert home.page is not None and home.get_title() == "six-pages.pdf"

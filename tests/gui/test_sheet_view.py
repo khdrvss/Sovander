@@ -424,6 +424,10 @@ class LazyCells(Mapping):
 
 def frame(widget):
     """Seconds to build the widget's render nodes, and to render them as the window would."""
+    if gi.version_info < (3, 44):
+        # PyGObject 3.42 (Ubuntu 22.04) cannot hand a GskRenderNode back to GTK and crashes freeing it
+        # in a later collection (see the pixels fixture); skip before making one
+        pytest.skip("render timings need PyGObject 3.44 or newer (Ubuntu 24.04)")
     start = time.perf_counter()
     snapshot = Gtk.Snapshot()
     widget.do_snapshot(snapshot)

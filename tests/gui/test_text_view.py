@@ -157,6 +157,12 @@ def test_read_only_monospace():
     assert view.has_line_numbers == (text_view.GtkSource is not None and text_view._line_numbers_are_safe())
 
 
+def test_no_line_numbers_where_the_library_cannot_tell_its_version(monkeypatch):
+    # GtkSourceView before 5.7.1 (Ubuntu 22.04 has 5.4) has no version functions in its GIR
+    monkeypatch.setattr(text_view, "GtkSource", object())
+    assert not text_view._line_numbers_are_safe()
+
+
 def test_note_is_shown_and_follows_the_language():
     view = TextView()
     assert view.note is None and not view._note_bar.get_revealed()

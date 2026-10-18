@@ -377,11 +377,17 @@ _MAGIC = (
     (b"II*\x00", "tiff"),
     (b"MM\x00*", "tiff"),
 )
+_HEIF_BRANDS = (b"heic", b"heix", b"hevc", b"hevx", b"mif1", b"msf1", b"heim", b"heis")
 
 
 def _loader_by_magic(data: bytes) -> str | None:
     if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
         return "webp"
+    if data[4:8] == b"ftyp" and data[8:12] in _HEIF_BRANDS:
+        # shared-mime-info 2.1 (Ubuntu 22.04) knows HEIF by file name only, so the bytes get no type and
+        # no loader; the loader's name differs between builds ("heif/avif"), the type it claims does not
+        formats = GdkPixbuf.Pixbuf.get_formats()
+        return next((f.get_name() for f in formats if "image/heif" in f.get_mime_types()), None)
     return next((name for magic, name in _MAGIC if data.startswith(magic)), None)
 
 
@@ -391,7 +397,7 @@ def _format_label(data: bytes) -> str | None:
         brand = data[8:12]
         if brand in (b"avif", b"avis"):
             return "AVIF"
-        if brand in (b"heic", b"heix", b"hevc", b"hevx", b"mif1", b"msf1", b"heim", b"heis"):
+        if brand in _HEIF_BRANDS:
             return "HEIC"
     name = _loader_by_magic(data)
     return name.upper() if name else None

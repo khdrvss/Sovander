@@ -4,6 +4,7 @@ import gc
 import time
 import weakref
 
+import gi
 import pytest
 from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Graphene, Gtk
 
@@ -228,6 +229,10 @@ def test_a_closed_home_page_is_freed(docs, store, wait):
 
 def drawn(widget):
     """The widget as drawn now, its own style included, as an RGBA pixmap."""
+    if gi.version_info < (3, 44):
+        # As the pixels fixture: PyGObject 3.42 (Ubuntu 22.04) cannot hand a GskRenderNode back to GTK
+        # and crashes freeing it in a later collection; skip before making one
+        pytest.skip("pixel checks need PyGObject 3.44 or newer (Ubuntu 24.04)")
     width, height = widget.get_width(), widget.get_height()
     snapshot = Gtk.Snapshot()
     Gtk.WidgetPaintable(widget=widget).snapshot(snapshot, width, height)
