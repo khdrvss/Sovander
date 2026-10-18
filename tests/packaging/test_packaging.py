@@ -85,6 +85,10 @@ DEPENDS = [
     "python3-fitz",
     "python3-uno",
     "libreoffice-writer-nogui | libreoffice-writer",
+    # Writer's UI files: without annotation.ui the engine aborts on any comment, and 24.04's -nogui Writer
+    # does not pull them. LibreOffice before 7.6 (22.04) has no such package: there only the full Writer
+    # carries the files
+    "libreoffice-uiconfig-writer | libreoffice-common (<< 4:7.6~)",
     "libreoffice-calc-nogui | libreoffice-calc",
     "libreoffice-impress-nogui | libreoffice-impress",
     "libreoffice-draw-nogui | libreoffice-draw",

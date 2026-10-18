@@ -85,6 +85,13 @@ def test_content_wins_over_the_given_kind(engine, fixture_file):
     assert pages(as_text) == pages(as_slides)
 
 
+def test_a_comment_leaves_the_engine_running(engine):
+    """Writer builds a comment's window from annotation.ui (libreoffice-uiconfig-writer, which 24.04's
+    libreoffice-writer-nogui does not pull); without the file soffice aborts."""
+    doc = flat_odt('<text:p>Commented<office:annotation><text:p>A note</text:p></office:annotation></text:p>')
+    assert "Commented" in first_page_text(list(convert(doc, TEXT, engine=engine))[-1])
+
+
 @pytest.fixture(scope="module")
 def encrypted_odt(engine):
     def make(eng):

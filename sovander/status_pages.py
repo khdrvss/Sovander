@@ -16,8 +16,8 @@ from gi.repository import Adw, GLib, Gtk  # noqa: E402
 
 from sovander.i18n import _  # noqa: E402
 
-INSTALL_COMMAND = ("sudo apt install libreoffice-writer-nogui libreoffice-calc-nogui "
-                   "libreoffice-impress-nogui libreoffice-draw-nogui python3-uno")
+INSTALL_COMMAND = ("sudo apt install libreoffice-writer-nogui libreoffice-uiconfig-writer "
+                   "libreoffice-calc-nogui libreoffice-impress-nogui libreoffice-draw-nogui python3-uno")
 
 
 def loading_page() -> Gtk.Widget:

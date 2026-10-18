@@ -148,6 +148,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
+        include:
+          # Writer's UI files (a comment's window): 24.04's libreoffice-writer-nogui does not pull them;
+          # 22.04's LibreOffice 7.3 has no such package
+          - os: ubuntu-24.04
+            extra_packages: libreoffice-uiconfig-writer
     runs-on: ${{ matrix.os }}
     # Ubuntu 22.04 (GTK 4.6, PyGObject 3.42, PyMuPDF 1.19) is not supported yet: visible, not blocking
     continue-on-error: ${{ matrix.os == 'ubuntu-22.04' }}
@@ -163,8 +168,10 @@ jobs:
           key: apt-${{ matrix.os }}-engine-${{ hashFiles('.github/workflows/ci.yml') }}
           restore-keys: apt-${{ matrix.os }}-engine-
       - name: Install Ubuntu's packages
+        env:
+          EXTRA_PACKAGES: ${{ matrix.extra_packages }}
         run: |
-          read -ra packages <<<"$UNIT_PACKAGES $GUI_PACKAGES $ENGINE_PACKAGES"
+          read -ra packages <<<"$UNIT_PACKAGES $GUI_PACKAGES $ENGINE_PACKAGES $EXTRA_PACKAGES"
           mkdir -p ~/apt-archives/partial
           sudo apt-get update -qq
           sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \

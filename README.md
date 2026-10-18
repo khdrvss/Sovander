@@ -103,7 +103,7 @@ Sovander is Python 3 with GTK 4 and libadwaita. On Ubuntu:
 
 ```sh
 sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0 \
-    python3-fitz python3-uno libreoffice-writer-nogui libreoffice-calc-nogui \
+    python3-fitz python3-uno libreoffice-writer-nogui libreoffice-uiconfig-writer libreoffice-calc-nogui \
     libreoffice-impress-nogui libreoffice-draw-nogui python3-cryptography python3-charset-normalizer \
     python3-pytest xvfb
 python3 -m sovander [file]                         # run from the checkout

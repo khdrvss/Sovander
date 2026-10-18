@@ -24,7 +24,8 @@ env:
     xvfb libgl1-mesa-dri gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0
     heif-gdk-pixbuf libheif-plugin-libde265 libavif-gdk-pixbuf librsvg2-common webp-pixbuf-loader
     fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
-    python3-uno libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui libreoffice-draw-nogui
+    python3-uno libreoffice-writer-nogui libreoffice-uiconfig-writer libreoffice-calc-nogui libreoffice-impress-nogui
+    libreoffice-draw-nogui
 
 jobs:
   tests:
