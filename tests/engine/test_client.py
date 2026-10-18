@@ -124,7 +124,7 @@ def test_encrypted_word_file_from_the_corpus(engine, corpus_file):
     assert pages(list(convert(path, TEXT, password=phrase, engine=engine))[-1]) >= 1
 
 
-def test_damaged_zip_is_repaired_and_flagged(engine, fixture_file):
+def test_damaged_zip_is_repaired_and_flagged(engine, fixture_file, repairs_ooxml):
     data = fixture_file("report.docx").read_bytes()
     chunks = list(convert(data[: int(len(data) * 0.9)], TEXT, engine=engine))
     assert chunks[-1].damaged and pages(chunks[-1]) >= 1

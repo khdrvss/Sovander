@@ -149,7 +149,7 @@ def test_spreadsheet_opens_in_the_sheet_view(context, show):
     assert isinstance(page.view, SheetView) and page.view.sheet_names
 
 
-def test_damaged_word_file_shows_the_readable_part(context, show):
+def test_damaged_word_file_shows_the_readable_part(context, show, repairs_ooxml):
     data = (FIXTURES / "report.docx").read_bytes()
     page = show(Source.from_bytes("cut.docx", data[: int(len(data) * 0.9)]), context)
     assert pump(lambda: page.state in ("ready", "error") and not getattr(page.view, "loading_more", False))

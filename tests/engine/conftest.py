@@ -4,6 +4,7 @@ Run them with ``scripts/dev-env.sh python3 -m pytest -m engine tests/engine``; w
 LibreOffice they skip, and with a LibreOffice that does not start they fail.
 """
 
+import re
 from pathlib import Path
 
 import pytest
@@ -31,3 +32,12 @@ def corpus_file():
         return path
 
     return get
+
+
+@pytest.fixture
+def repairs_ooxml(engine):
+    """Skips before LibreOffice 24.2, which opens .docx/.xlsx/.pptx zips without repair even when the repair
+    is approved (tdf#96401, commit 86c682273d90): 7.3 on Ubuntu 22.04 reports a cut .docx as damaged."""
+    found = re.search(r"(\d+)\.(\d+)", engine.version)
+    if found and (int(found[1]), int(found[2])) < (24, 2):
+        pytest.skip(f"{engine.version} cannot repair a damaged OOXML zip (tdf#96401, fixed in 24.2)")
