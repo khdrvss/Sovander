@@ -35,7 +35,7 @@ from sovander.archive import (  # noqa: E402
     WrongPassword,
 )
 from sovander.i18n import N_, _  # noqa: E402
-from sovander.views import weak_handler  # noqa: E402
+from sovander.views import to_main_loop, weak_handler  # noqa: E402
 from sovander.zipnames import CHOICES  # noqa: E402
 
 log = logging.getLogger(__name__)
@@ -373,7 +373,7 @@ def _read(archive: Archive, entry: Entry, password: str | None, deliver) -> None
         result = (archive.read(entry, password), None)
     except (ArchiveError, OSError, MemoryError, ValueError) as e:
         result = (None, e)
-    GLib.idle_add(deliver, result)
+    to_main_loop(deliver, result)
 
 
 # Cells: module functions, so no handler holds a view

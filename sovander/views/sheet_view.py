@@ -24,7 +24,7 @@ from gi.repository import GLib, Gtk, Pango  # noqa: E402
 
 from sovander import i18n  # noqa: E402
 from sovander.i18n import _  # noqa: E402
-from sovander.views import weak_handler  # noqa: E402
+from sovander.views import to_main_loop, weak_handler  # noqa: E402
 from sovander.views.sheet_grid import (  # noqa: E402
     FORMULA_DELAY_MS,
     SheetGrid,
@@ -195,7 +195,7 @@ class SheetView(Gtk.Box):
                 grid, error = book.grid(index), None
             except Exception as exc:  # noqa: BLE001 - shown as this sheet's error, the others still work
                 grid, error = None, exc
-            GLib.idle_add(_deliver, ref, "_grid_ready", token, book, index, grid, error)
+            to_main_loop(_deliver, ref, "_grid_ready", token, book, index, grid, error)
 
         threading.Thread(target=work, name="sovander-sheet-grid", daemon=True).start()
 
@@ -339,7 +339,7 @@ class SheetView(Gtk.Box):
             except Exception:  # noqa: BLE001 - the value stays shown; the formula is a nicety
                 log.warning("formula of %s!%s not read", name, cell_address(row, col), exc_info=True)
                 text = None
-            GLib.idle_add(_deliver, ref, "_formula_ready", token, text)
+            to_main_loop(_deliver, ref, "_formula_ready", token, text)
 
         threading.Thread(target=work, name="sovander-sheet-formula", daemon=True).start()
         return GLib.SOURCE_REMOVE

@@ -7,6 +7,7 @@ import faulthandler
 import gc
 import itertools
 import signal
+import sys
 import threading
 import weakref
 import zipfile
@@ -150,6 +151,20 @@ def test_zip_entries_open_from_memory_in_windows_of_their_own(open_file, app, wa
     (entry_window,) = [w for w in app.get_windows() if w is not window]
     assert entry_window.page.source.path is None and entry_window.page.source.name == "plain.txt"
     assert isinstance(entry_window.page.view, TextView) and "Plain text" in entry_window.page.view.text
+
+
+def test_an_entry_read_after_its_window_closed_opens_nothing(open_file, app, wait, monkeypatch):
+    archive_view = pytest.importorskip("sovander.views.archive_view")
+    errors = []
+    monkeypatch.setattr(sys, "excepthook", lambda *exc: errors.append(exc))  # where callback errors go
+    window = open_file("archive.zip")
+    view = window.page.view
+    assert isinstance(view, archive_view.ArchiveView)
+    (entry,) = [e for e in view.shown() if e.name == "plain.txt"]
+    view.open_entry(entry)
+    window.close()
+    assert wait(lambda: not view.busy)
+    assert errors == [] and app.get_windows() == []
 
 
 def test_missing_file_names_the_file_and_the_app_keeps_going(open_file, app, tmp_path):

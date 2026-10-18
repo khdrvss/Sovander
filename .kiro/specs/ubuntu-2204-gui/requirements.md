@@ -33,3 +33,29 @@ GtkSourceView 5.4.1, shared-mime-info 2.1). Reproduced in an ubuntu:22.04 contai
 - WHEN a text file or a HEIC photo is opened on 22.04 THEN it SHALL show (new tests
   `test_no_line_numbers_where_the_library_cannot_tell_its_version`, `test_heic_finds_its_loader_by_brand`).
 - WHEN the GUI suite runs on 24.04 THEN it SHALL pass as before: 334 passed (332 + the 2 new tests).
+
+## Extension 2026-10-18: results starved on the CI runner
+
+With the segfault gone, CI's 22.04 job still failed 15 tests in test_app, all `still loading`, while
+the same suite passed in a 22.04 container. Evidence from the hang diagnostic (commit 6cc769c): the
+main context was free and always had something pending, and only the test thread was running.
+
+- Root cause: worker threads handed their results back with `GLib.idle_add` (priority 200). The
+  loading page's spinner keeps a redraw-priority source (120) due on every pass on a slow runner
+  (software rendering, GTK 4.6), and GLib dispatches only the highest ready priority, so the result
+  waited until the spinner went away. Reproduced locally with `docker run --cpus=0.5`: 4 of 6 tests
+  failed with `still loading`.
+- Fix: `views.to_main_loop` posts at `PRIORITY_HIGH_IDLE` (100), above redraw; all six worker
+  handoffs use it (open job, archive entry, sheet grid and formula, find batches).
+- Found behind it: an archive entry read after its window closed raised AttributeError in
+  `window._open_entry` (no application left). The window now ignores it.
+
+### Acceptance (extension)
+
+- WHEN a worker posts a result while a redraw-priority source is always due THEN it SHALL reach the main
+  loop (`tests/unit/test_main_loop.py`; fails with plain `idle_add`, checked by mutation).
+- WHEN an archive entry finishes reading after its window closed THEN nothing SHALL open and no error
+  SHALL be raised (`test_an_entry_read_after_its_window_closed_opens_nothing`; fails without the guard).
+- WHEN test_app, test_archive_view, test_sheet_view and test_find run in a 22.04 container limited to
+  half a CPU THEN they SHALL pass: 120 passed, 9 skipped (were 4 of 6 failed in test_app alone).
+- WHEN the suites run on 24.04 THEN they SHALL pass as before: gui 334, unit and fast 712, engine 71.

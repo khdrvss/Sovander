@@ -40,7 +40,7 @@ from sovander.open_jobs import (  # noqa: E402
 )
 from sovander.router import Kind  # noqa: E402
 from sovander.store import doc_key  # noqa: E402
-from sovander.views import weak_handler  # noqa: E402
+from sovander.views import to_main_loop, weak_handler  # noqa: E402
 from sovander.views.image_view import ImageView  # noqa: E402
 from sovander.views.page_view import FITZ_LOCK, PageView, PasswordRequired  # noqa: E402
 from sovander.views.sheet_view import SheetView  # noqa: E402
@@ -132,7 +132,7 @@ class DocumentPage(Gtk.Box):
         token, ref = self._token, weakref.ref(self)
 
         def post(method: str, *values) -> None:
-            GLib.idle_add(deliver, ref, token, method, values)
+            to_main_loop(deliver, ref, token, method, values)
 
         def alive() -> bool:
             page = ref()

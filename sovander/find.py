@@ -25,7 +25,7 @@ import gi
 
 from sovander import i18n
 from sovander.i18n import _
-from sovander.views import weak_handler
+from sovander.views import to_main_loop, weak_handler
 from sovander.views.selection import keep_with, rgba
 
 try:
@@ -149,9 +149,9 @@ def _search_pages(ref, gen, doc, lock, needle, case, count):
         if found:
             batch[page] = found
         if time.monotonic() - last > BATCH_SECONDS:
-            GLib.idle_add(_deliver, ref, gen, batch, False)
+            to_main_loop(_deliver, ref, gen, batch, False)
             batch, last = {}, time.monotonic()
-    GLib.idle_add(_deliver, ref, gen, batch, True)
+    to_main_loop(_deliver, ref, gen, batch, True)
 
 
 def _deliver(ref, gen, batch, done):

@@ -255,7 +255,9 @@ class SovanderWindow(Adw.ApplicationWindow):
         self.get_application().open_paths(paths, window=self)
 
     def _open_entry(self, name: str, data: bytes) -> None:
-        self.get_application().open_sources([Source.from_bytes(name, data)])
+        app = self.get_application()
+        if app is not None:  # the entry was read after this window closed: nothing to open it in
+            app.open_sources([Source.from_bytes(name, data)])
 
     # The view's controls
 
