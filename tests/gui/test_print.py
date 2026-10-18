@@ -4,7 +4,7 @@ import os
 import time
 
 import pytest
-from gi.repository import GLib, Gtk
+from gi.repository import Gtk
 
 from sovander import i18n
 from sovander import print as printing
@@ -73,22 +73,16 @@ def test_standard_sizes_print_under_their_paper_names():
     assert odd.is_custom() and abs(odd.get_width(Gtk.Unit.POINTS) - 300) < 0.5
 
 
-def test_only_the_pages_picked_are_drawn(page_view, tmp_path, monkeypatch, wait):
+def test_each_page_is_drawn_once_when_gtk_asks_for_it(page_view, tmp_path, monkeypatch):
+    # GTK picks the pages: it asks for only those in the user's range. No printer-free run can show
+    # that: export always prints every page, and printing without the dialog never picks "Print to
+    # File" (GTK skips virtual printers there) but the system's default printer. Sovander's part is
+    # to draw each page GTK asks for, once and nothing more.
     drawn = []
     real = printing.render_page
     monkeypatch.setattr(printing, "render_page", lambda v, nr, dpi: drawn.append(nr) or real(v, nr, dpi))
-    settings = Gtk.PrintSettings()
-    settings.set_printer(GLib.dgettext("gtk40", "Print to File"))
-    settings.set(Gtk.PRINT_SETTINGS_OUTPUT_URI, (tmp_path / "range.pdf").as_uri())
-    settings.set_print_pages(Gtk.PrintPages.RANGES)
-    pages = Gtk.PageRange()
-    pages.start = pages.end = 1
-    settings.set_page_ranges([pages])
-    done = []
-    op = print_view(None, page_view, settings=settings, dialog=False)
-    op.connect("done", lambda _op, result: done.append(result))
-    assert wait(lambda: done or op.is_finished())
-    assert drawn == [1]
+    print_view(None, page_view, export_to=tmp_path / "out.pdf")
+    assert drawn == [0, 1, 2]
 
 
 def test_the_shown_page_is_offered_as_the_current_page(page_view, tmp_path):

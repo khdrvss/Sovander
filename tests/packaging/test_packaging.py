@@ -27,6 +27,7 @@ LAUNCHER = ROOT / "packaging" / "sovander.sh"
 BUILD_DEB = ROOT / "packaging" / "build-deb.sh"
 BUNDLE = ROOT / "packaging" / "make-offline-bundle.sh"
 MAINTAINER_SCRIPTS = [ROOT / "packaging" / "debian" / s for s in ("postinst", "prerm", "postrm")]
+WORKFLOWS = ROOT / ".github" / "workflows"
 SIZE_BUDGET = 20 * 1024 * 1024  # NFR Size: the Viewer's own installed files
 
 # One MIME type per format named in Requirement 2 (the canonical shared-mime-info name)
@@ -76,6 +77,7 @@ REQUIRED_TYPES = {
 DEPENDS = [
     "python3 (>= 3.10)",
     "python3-gi",
+    "python3-gi-cairo",  # printing: cairo contexts reach Python only through it; python3-gi does not pull it
     "gir1.2-gtk-4.0",
     "gir1.2-adw-1",
     "gir1.2-gtksource-5",
@@ -93,10 +95,14 @@ DEPENDS = [
     "fonts-liberation2",
     "apparmor",
     "heif-gdk-pixbuf",
+    # HEIC's HEVC decoder: only suggested by 24.04's libheif1 since 1.17.6-1ubuntu4.3 (LP: #2142762);
+    # 22.04's libheif1 1.12 has it built in and no plugin package
+    "libheif-plugin-libde265 | libheif1 (<< 1.15~)",
     "libavif-gdk-pixbuf",
     "librsvg2-common",  # the SVG image loader: absent on a minimal system
     "webp-pixbuf-loader",  # the WebP image loader: absent even on a fresh Ubuntu 24.04
 ]
+ON_EVERY_RUNNER = {"python3", "apparmor"}
 
 needs_dpkg_deb = pytest.mark.skipif(shutil.which("dpkg-deb") is None, reason="dpkg-deb not installed")
 needs_parser = pytest.mark.skipif(
@@ -342,6 +348,26 @@ def test_deb_control_fields(deb):
     info = run("dpkg-deb", "-I", str(deb)).stdout
     for script in ("postinst", "prerm", "postrm"):
         assert re.search(rf"\s\*\s+{script}\s", info), script
+
+
+def workflow_packages(path: Path) -> set[str]:
+    """Package names in a workflow's *_PACKAGES lists and its matrix's extra_packages entries."""
+    text = path.read_text()
+    names = set()
+    for block in re.findall(r"^  [A-Z_]+_PACKAGES: >-\n((?:    .*\n)+)", text, re.M):
+        names.update(block.split())
+    for line in re.findall(r"^\s+(?:- )?extra_packages: (.+)$", text, re.M):
+        names.update(line.split())
+    return names
+
+
+@pytest.mark.parametrize("workflow", ["ci.yml", "release.yml"])
+def test_tests_run_with_every_runtime_dependency(workflow):
+    # The views must be tested with what users get: blank prints and undecodable HEIC passed on a
+    # machine that had the missing packages from other software
+    installed = workflow_packages(WORKFLOWS / workflow) | ON_EVERY_RUNNER
+    missing = [d for d in DEPENDS if not {re.split(r"[\s(]", a.strip())[0] for a in d.split("|")} & installed]
+    assert not missing, missing
 
 
 @needs_dpkg_deb

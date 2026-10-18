@@ -34,7 +34,7 @@ env:
     python3-pytest python3-gi gir1.2-glib-2.0 gir1.2-gtk-4.0 python3-fitz python3-cryptography
     python3-charset-normalizer librsvg2-common
   GUI_PACKAGES: >-
-    xvfb libgl1-mesa-dri gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0
+    xvfb libgl1-mesa-dri gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 gir1.2-webkit-6.0 python3-gi-cairo
     heif-gdk-pixbuf libavif-gdk-pixbuf webp-pixbuf-loader fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
   ENGINE_PACKAGES: >-
     python3-uno libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui
@@ -105,6 +105,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
+        include:
+          # HEIC's HEVC decoder: a plugin only suggested by 24.04's libheif1; built into 22.04's
+          - os: ubuntu-24.04
+            extra_packages: libheif-plugin-libde265
     runs-on: ${{ matrix.os }}
     # Ubuntu 22.04 (GTK 4.6, PyGObject 3.42, PyMuPDF 1.19) is not supported yet: visible, not blocking
     continue-on-error: ${{ matrix.os == 'ubuntu-22.04' }}
@@ -120,8 +124,10 @@ jobs:
           key: apt-${{ matrix.os }}-gui-${{ hashFiles('.github/workflows/ci.yml') }}
           restore-keys: apt-${{ matrix.os }}-gui-
       - name: Install Ubuntu's packages
+        env:
+          EXTRA_PACKAGES: ${{ matrix.extra_packages }}
         run: |
-          read -ra packages <<<"$UNIT_PACKAGES $GUI_PACKAGES"
+          read -ra packages <<<"$UNIT_PACKAGES $GUI_PACKAGES $EXTRA_PACKAGES"
           mkdir -p ~/apt-archives/partial
           sudo apt-get update -qq
           sudo apt-get install -y -qq -o APT::Keep-Downloaded-Packages=true \

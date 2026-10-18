@@ -1,0 +1,10 @@
+{
+  "feature": "gui-ci-red",
+  "mode": "bugfix",
+  "workflow": "bugfix",
+  "language": "en",
+  "phase": "implementation",
+  "approvals": { "bugfix": true, "design": true, "tasks": true },
+  "created": "2026-10-18",
+  "updated": "2026-10-18"
+}
