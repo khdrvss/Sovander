@@ -50,6 +50,14 @@ main context was free and always had something pending, and only the test thread
 - Found behind it: an archive entry read after its window closed raised AttributeError in
   `window._open_entry` (no application left). The window now ignores it.
 
+- Audit of the other handoffs (after dcdc1bd): page renders (`render.py`), the tile request that
+  starts them (`page_view._queue_update`) and thumbnails (`thumbs.py`) waited the same way while any
+  spinner spun, e.g. the find bar's during a PDF search, so the page with the match stayed blank. They
+  use `to_main_loop` too. Review: `to_main_loop` now runs its function once whatever it returns, since a
+  callback repeating above redraw would hold off every redraw and input event.
+- Kept below redraw on purpose: `sheet_grid._index_step` (repeats per chunk; the comment says why).
+  Not moved: `image_view._on_scale` (could wait behind its own animation; not measured).
+
 ### Acceptance (extension)
 
 - WHEN a worker posts a result while a redraw-priority source is always due THEN it SHALL reach the main
@@ -58,4 +66,9 @@ main context was free and always had something pending, and only the test thread
   SHALL be raised (`test_an_entry_read_after_its_window_closed_opens_nothing`; fails without the guard).
 - WHEN test_app, test_archive_view, test_sheet_view and test_find run in a 22.04 container limited to
   half a CPU THEN they SHALL pass: 120 passed, 9 skipped (were 4 of 6 failed in test_app alone).
-- WHEN the suites run on 24.04 THEN they SHALL pass as before: gui 334, unit and fast 712, engine 71.
+- WHEN a page or a thumbnail is drawn while a redraw-priority source is always due THEN it SHALL arrive
+  (`test_pages_are_drawn_while_a_spinner_keeps_redrawing`,
+  `test_a_thumbnail_arrives_while_a_spinner_keeps_redrawing`; both failed before the change) and a
+  callback returning True SHALL run once
+  (`test_it_runs_once_whatever_the_callback_returns`).
+- WHEN the suites run on 24.04 THEN they SHALL pass as before: gui 336, unit and fast 716, engine 71.

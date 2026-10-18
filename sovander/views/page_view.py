@@ -13,7 +13,7 @@ import gi
 
 from sovander import i18n
 from sovander.i18n import _
-from sovander.views import weak_handler
+from sovander.views import to_main_loop, weak_handler
 from sovander.views.render import FITZ_LOCK, PasswordRequired, TileRenderer, device_scale, open_pdf
 
 try:
@@ -486,7 +486,7 @@ class PageView(Gtk.Widget, Gtk.Scrollable):
 
     def _queue_update(self):
         if not self._update_id:
-            self._update_id = GLib.idle_add(self._update)
+            self._update_id = to_main_loop(self._update)  # tiles are asked for here: not below a spinner
 
     def _update(self):
         """Ask for the tiles in view, then one screen ahead and one behind; forget far pages."""

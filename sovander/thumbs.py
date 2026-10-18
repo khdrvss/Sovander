@@ -32,6 +32,7 @@ from gi.repository import GdkPixbuf, GLib  # noqa: E402
 from sovander import paths  # noqa: E402
 from sovander.cache import FULL, PAGE1, content_key  # noqa: E402
 from sovander.store import Forgotten, Recent, Store, doc_key, local_path  # noqa: E402
+from sovander.views import to_main_loop  # noqa: E402
 from sovander.views.render import FITZ_LOCK  # noqa: E402
 
 try:
@@ -253,7 +254,7 @@ class Thumbnails:
                         png_path.unlink(missing_ok=True)
                         png_path = None
         if done is not None:
-            GLib.idle_add(_deliver, done, uri, png_path)
+            to_main_loop(_deliver, done, uri, png_path)
 
     def _render(self, kind: str, path: Path | None, pdf: bytes | None) -> bytes | None:
         if pdf is not None:

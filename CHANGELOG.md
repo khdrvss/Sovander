@@ -4,8 +4,9 @@ All notable changes to Sovander. Versions follow [Semantic Versioning](https://s
 
 ## Unreleased
 
-- **Fixed:** on a slow machine a document could stay on the loading spinner for good: results of
-  background work now reach the window ahead of the spinner's redraws.
+- **Fixed:** on a slow machine a document could stay on the loading spinner for good, and pages or
+  thumbnails could stay blank while a search ran: results of background work now reach the window
+  ahead of a spinner's redraws.
 - **Fixed:** closing an archive's window while one of its files was still being read no longer raises
   an error.
 

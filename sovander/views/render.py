@@ -12,7 +12,7 @@ from pathlib import Path
 import gi
 
 from sovander.i18n import _
-from sovander.views import night
+from sovander.views import night, to_main_loop
 
 try:
     import pymupdf as fitz
@@ -114,7 +114,7 @@ class RenderWorker:
                 result = job()
             except Exception as exc:  # noqa: BLE001 - a damaged page must not stop the other pages
                 result = exc
-            GLib.idle_add(self._finish, key, result)
+            to_main_loop(self._finish, key, result)
 
     def _finish(self, key, result):
         with self._cond:

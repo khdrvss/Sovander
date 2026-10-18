@@ -24,16 +24,21 @@ def collect_garbage_on_main_thread(interval_s: int = GC_INTERVAL_S) -> int:
     return GLib.timeout_add_seconds(interval_s, collect)
 
 
-def to_main_loop(func, *args) -> None:
-    """Hand a worker thread's result to ``func`` on the GTK main loop, above redraw priority.
+def to_main_loop(func, *args) -> int:
+    """Run ``func(*args)`` once on the GTK main loop, above redraw priority; returns the GLib source id.
 
-    At the default idle priority a result can wait for good: on a slow machine (software rendering,
-    GTK 4.6) a spinner's frames are always due before it, so the spinner that waits for the result
-    never stops.
+    For a worker thread's result, and for work the screen waits for. At the default idle priority it
+    can wait for good: on a slow machine (software rendering, GTK 4.6) a spinner's frames are always
+    due before it, so the spinner that waits for the result never stops. It runs once whatever
+    ``func`` returns: repeated at this priority, it would hold off every redraw and input event.
     """
     from gi.repository import GLib
 
-    GLib.idle_add(func, *args, priority=GLib.PRIORITY_HIGH_IDLE)
+    def once():
+        func(*args)
+        return GLib.SOURCE_REMOVE
+
+    return GLib.idle_add(once, priority=GLib.PRIORITY_HIGH_IDLE)
 
 
 def weak_handler(method):

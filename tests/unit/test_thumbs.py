@@ -156,6 +156,19 @@ def make_pdf_file(path: Path) -> Path:
     return path
 
 
+def test_a_thumbnail_arrives_while_a_spinner_keeps_redrawing(store, files):
+    path = make_pdf_file(files / "a.pdf")
+    store.record_open(str(path), "a.pdf", "pdf")
+    got = []
+    # On a slow machine a spinner in any window keeps a frame due on every pass
+    busy = GLib.idle_add(lambda: GLib.SOURCE_CONTINUE, priority=GLib.PRIORITY_HIGH_IDLE + 20)
+    try:
+        assert Thumbnails(store).request(recent_of(store, str(path)), lambda u, png: got.append(png))
+        assert pump(lambda: got, 5) and got[0] is not None
+    finally:
+        GLib.source_remove(busy)
+
+
 def test_an_image_thumbnail(store, files):
     image = files / "photo.png"
     image.write_bytes(big_png())

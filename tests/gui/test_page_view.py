@@ -10,7 +10,7 @@ from sovander.views import render
 from sovander.views.page_view import GAP, KEEP_PAGES, LOADING_ROW, MARGIN, PX_PER_PT, PasswordRequired
 
 gi.require_version("Gdk", "4.0")
-from gi.repository import Gdk  # noqa: E402
+from gi.repository import Gdk, GLib  # noqa: E402
 
 try:
     import pymupdf as fitz
@@ -226,6 +226,16 @@ def test_replace_keeps_the_place_and_shows_loading_more(viewer, make_pdf, wait, 
     # Until the full copy is drawn the old drawing stays on screen, so nothing flashes white
     assert near(colour_at(viewer, pixels(viewer), 0, 172, 200), (204, 25, 25))
     assert wait(lambda: viewer.is_page_rendered(0))
+
+
+def test_pages_are_drawn_while_a_spinner_keeps_redrawing(viewer, make_pdf, wait):
+    # On a slow machine a spinner (the find bar's, another window's) keeps a frame due on every pass
+    busy = GLib.idle_add(lambda: GLib.SOURCE_CONTINUE, priority=GLib.PRIORITY_HIGH_IDLE + 20)
+    try:
+        viewer.load(make_pdf(3))
+        assert wait(lambda: viewer.is_page_rendered(0), 5)
+    finally:
+        GLib.source_remove(busy)
 
 
 def test_textures_stay_near_the_view(viewer, make_pdf, wait):

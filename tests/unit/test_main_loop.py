@@ -39,3 +39,12 @@ def test_a_result_reaches_the_main_loop_past_constant_redraws():
 def test_at_idle_priority_it_would_wait_for_good():
     # The cause: GLib runs only the highest ready priority, and idle is below redraw
     assert handed_over(GLib.idle_add) == []
+
+
+def test_it_runs_once_whatever_the_callback_returns():
+    calls = []
+    to_main_loop(lambda: calls.append(1) or True)  # True would repeat it at idle_add
+    context = GLib.MainContext.default()
+    for _ in range(20):
+        context.iteration(False)
+    assert calls == [1]
